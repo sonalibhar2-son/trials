@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#FBF8F1">
+<title>Trials</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Old+Mincho:wght@400;500;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--washi:#FBF8F1;--stone:#F1ECDD;--ink:#2A2A28;--ink-soft:#6E6B63;--ink-faint:#9F9A8E;--line:#E1DCCF;--moss:#2C4A34;--clay:#A8763A;--red:#A5483D;
+--r-lg:20px;--r-md:14px;--r-pill:22px;--shadow-card:0 10px 22px -12px rgba(42,42,40,.2);--shadow-accent:0 10px 22px -10px rgba(44,74,52,.24)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--washi)}
+body{font-family:'Zen Kaku Gothic New',sans-serif;color:var(--ink);display:flex;justify-content:center}
+#app{width:100%;max-width:440px;min-height:100dvh;padding:calc(18px + env(safe-area-inset-top)) 20px calc(18px + env(safe-area-inset-bottom));display:flex;flex-direction:column;position:relative}
+button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:pointer}
+input,textarea{font:inherit;color:var(--ink)}
+.serif{font-family:'Zen Old Mincho',serif}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.crumb{font-size:12px;color:var(--ink-faint);margin:14px 0 16px}
+.back{font-size:13px;font-weight:600;color:var(--ink-soft);padding:6px 0}
+.h1{font-family:'Zen Old Mincho',serif;font-weight:500;font-size:23px;margin:2px 0 4px}
+.h2{font-family:'Zen Old Mincho',serif;font-weight:500;font-size:21px;margin:2px 0 8px}
+.sub{font-size:13.5px;color:var(--ink-soft);line-height:1.6;margin:0 0 18px}
+.card{background:var(--stone);border-radius:var(--r-lg);padding:16px;margin-bottom:10px;box-shadow:var(--shadow-card)}
+.card.habit{border-left:4px solid var(--moss)}
+.item-name{font-family:'Zen Old Mincho',serif;font-weight:500;font-size:16.5px}
+.badge{display:block;font-size:10px;font-weight:700;color:var(--moss);margin-top:2px}
+.icon-btn{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1.3px solid var(--line);color:var(--ink-faint);font-size:13px;flex-shrink:0}
+.lab-icon{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--stone);flex-shrink:0}
+.btn{background:var(--moss);color:#fff;border-radius:var(--r-pill);padding:14px;font-weight:500;font-size:14.5px;width:100%;text-align:center;box-shadow:var(--shadow-accent)}
+.btn.dark{background:var(--ink);box-shadow:none}
+.btn.out{background:transparent;border:1.4px solid var(--moss);color:var(--moss);box-shadow:none}
+.btn.red{background:var(--red);box-shadow:none}
+.btn:disabled{opacity:.4}
+.pill{background:var(--moss);color:#fff;font-size:12px;font-weight:500;padding:10px 14px;border-radius:var(--r-pill);flex-shrink:0}
+.did{flex:1.4;background:var(--moss);color:#fff;text-align:center;font-weight:500;font-size:13px;padding:12px 6px;border-radius:var(--r-pill)}
+.adj{flex:1;border:1.4px solid var(--ink-faint);color:var(--ink-soft);text-align:center;font-weight:500;font-size:13px;padding:12px 6px;border-radius:var(--r-pill)}
+.actions{display:flex;gap:8px;margin-top:14px}
+.field{width:100%;background:var(--stone);border:1.4px solid var(--line);border-radius:12px;padding:14px;font-size:15px;margin:6px 0 16px;outline:none}
+.field:focus{border-color:var(--moss)}
+.field.small{padding:9px 11px;font-size:13px;margin:8px 0 0;background:transparent;border-style:dashed}
+.link{font-weight:500;font-size:13px;color:var(--moss)}
+.faint{color:var(--ink-faint)}
+.center{text-align:center}
+.grow{flex:1}
+.nav{display:flex;justify-content:center;gap:28px;margin-top:auto;padding-top:14px;border-top:1px solid var(--line)}
+.nav button{font-weight:500;font-size:13px;color:var(--ink-faint);padding:6px}
+.carousel{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding-top:12px}
+.cc{display:flex;align-items:center;justify-content:center;gap:6px}
+.dots{display:flex;gap:7px;align-items:center;padding:0 6px}.dots i{width:7px;height:7px;border-radius:4px;background:#D2CCBB;transition:.2s}.dots i.on{background:var(--moss);width:20px}
+.arr{font-size:26px;line-height:1;color:var(--ink-soft);font-weight:600;padding:4px 12px}.arr:disabled{opacity:.25}
+.plus{font-size:15px;font-weight:700;color:var(--ink-faint);border:1.3px solid var(--line);border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center}
+.list-row{padding:14px 2px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
+.nm{font-family:'Zen Old Mincho',serif;font-weight:500;font-size:15.5px}
+.meta{font-size:11.5px;color:var(--ink-faint);margin-top:2px}
+.words{font-family:'Zen Old Mincho',serif;font-style:italic;color:var(--moss);font-size:13.5px;margin-top:4px}
+.chk{width:20px;height:20px;border-radius:50%;background:var(--moss);color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.box{width:20px;height:20px;border-radius:6px;border:1.5px solid var(--line);flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px}
+.box.on{background:var(--moss);border-color:var(--moss)}
+.sec{font-size:12px;font-weight:700;color:var(--ink-faint);margin:18px 0 2px}
+.sub2{font-size:11px;color:var(--ink-faint);margin:12px 0 0}
+.toggle{width:40px;height:23px;border-radius:12px;background:var(--line);position:relative;flex-shrink:0}
+.toggle.on{background:var(--moss)}
+.toggle i{width:17px;height:17px;border-radius:50%;background:#fff;position:absolute;top:3px;left:3px;box-shadow:0 1px 3px rgba(0,0,0,.15);transition:.15s}
+.toggle.on i{left:20px}
+.set{padding:15px 2px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;width:100%}
+.set b{font-weight:500;font-size:15px;display:block}.set small{font-size:12px;color:var(--ink-faint);display:block;margin-top:2px;line-height:1.45}
+.menu{position:absolute;right:20px;top:calc(62px + env(safe-area-inset-top));background:#fff;box-shadow:0 8px 24px rgba(42,42,40,.2);border-radius:12px;padding:6px;width:230px;z-index:20}
+.menu button{display:block;width:100%;text-align:left;padding:11px 10px;font-size:13.5px;font-weight:600;border-radius:8px}
+.menu hr{border:none;border-top:1px solid var(--line);margin:4px 0}
+.overlay{position:fixed;inset:0;background:rgba(42,42,40,.38);display:flex;align-items:center;justify-content:center;padding:24px;z-index:50}
+.modal{background:var(--washi);border-radius:20px;padding:22px;max-width:360px;width:100%}
+.modal p{font-size:14px;line-height:1.6;color:var(--ink-soft);margin:6px 0 18px}
+.modal .two{display:flex;gap:8px}
+.flash{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%);background:rgba(42,42,40,.88);color:#fff;font-family:'Zen Old Mincho',serif;font-size:15px;padding:9px 18px;border-radius:18px;z-index:55;max-width:80vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;pointer-events:none;animation:ff 1.5s ease forwards}@keyframes ff{0%{opacity:0}15%,65%{opacity:1}100%{opacity:0}}
+.toast{position:fixed;left:50%;bottom:calc(30px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--ink);color:#fff;font-size:13px;font-weight:600;padding:9px 16px;border-radius:16px;z-index:60;animation:tf 2.4s ease forwards;white-space:nowrap}
+@keyframes tf{0%{opacity:0;transform:translateX(-50%) translateY(6px)}10%,75%{opacity:1;transform:translateX(-50%)}100%{opacity:0}}
+.pulse{display:inline-block;animation:cp .7s ease}
+@keyframes cp{0%{transform:scale(1)}30%{transform:scale(1.25);color:var(--moss)}100%{transform:scale(1)}}
+.side{position:fixed;inset:0;z-index:40;display:flex}
+.side .pane{background:var(--stone);width:82%;max-width:340px;padding:calc(20px + env(safe-area-inset-top)) 12px 20px;overflow:auto;box-shadow:5px 0 18px rgba(42,42,40,.12)}
+.side .shade{flex:1;background:rgba(42,42,40,.3)}
+.sitem{display:flex;align-items:center;gap:10px;margin:0 0 6px;padding:13px 15px;border-radius:12px;font-weight:500;font-size:14.5px;color:var(--ink-soft);min-height:48px;width:100%;text-align:left}
+.sitem.act{background:var(--washi);color:var(--ink);border-left:3px solid var(--moss)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--clay)}
+.swatch{width:28px;height:28px;border-radius:8px;flex-shrink:0}
+.pal{display:flex;gap:10px;padding:2px 4px 14px;flex-wrap:wrap}.pal button{width:24px;height:24px;border-radius:50%}
+.prow{display:flex;align-items:center;gap:10px;padding:10px;border:1.4px solid var(--line);border-radius:var(--r-md);margin-bottom:8px}
+.prow input{flex:1;border:none;background:none;font-family:'Zen Old Mincho',serif;font-size:16px;outline:none;min-width:0}
+.why h3{font-family:'Zen Old Mincho',serif;font-weight:500;font-size:17px;margin:20px 0 4px}
+.why p{font-size:14px;line-height:1.7;color:var(--ink-soft);margin:0}
+.seg{fill:none;stroke-width:24;stroke-linecap:round;cursor:pointer;transition:stroke-width .18s ease,filter .18s ease,opacity .15s}
+@media (hover:hover){.seg:hover{stroke-width:31;filter:drop-shadow(0 5px 7px rgba(42,42,40,.28)) brightness(1.06)}}
+.seg:active{stroke-width:21;opacity:.9;filter:none}
+.lbl{transition:font-size .18s,font-weight .18s}.lbl.hot{font-weight:700;font-size:10.5px}.ring-t1{font-size:9.5px;fill:#9F9A8E}.ring-t2{font-family:'Zen Old Mincho',serif;font-size:21px;font-weight:600;fill:#2C4A34}
+.lbl{font-size:9.5px;font-weight:500;fill:var(--ink);pointer-events:none}
+.empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px 0}
+.labcard{background:#fff;border-radius:var(--r-lg);padding:20px;box-shadow:var(--shadow-card)}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const KEY='trials.v1';
+const PAL=['#35573F','#3F657A','#AD8038','#96525F','#664F82','#357569','#855C38'];
+const DEF=[['Physical Health',0],['Career',1],['Finance',2],['Relationships',3],['Hobbies',4],['Mental Health',5],['Spiritual Health',6]]
+  .map((d,i)=>({id:'s'+(i+1),name:d[0],color:PAL[d[1]],isDefault:true}));
+const fresh=()=>({onboarded:false,slices:JSON.parse(JSON.stringify(DEF)),projects:[],exps:[],entries:[],gratitude:[],showFinished:false,backup:null,lastProj:{},reveal:false,flashName:true});
+let S;
+try{S=JSON.parse(localStorage.getItem(KEY))||fresh()}catch(e){S=fresh()}
+S=Object.assign(fresh(),S);
+if(S.backup&&S.backup.expiresAt<Date.now())S.backup=null;
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const uid=()=>Math.random().toString(36).slice(2,10);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const today=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+const dayLabel=iso=>{const t=today();if(iso===t)return'Today';const y=new Date();y.setDate(y.getDate()-1);const ys=y.getFullYear()+'-'+String(y.getMonth()+1).padStart(2,'0')+'-'+String(y.getDate()).padStart(2,'0');if(iso===ys)return'Yesterday';const [a,b,c]=iso.split('-').map(Number);return new Date(a,b-1,c).toLocaleDateString(undefined,{month:'short',day:'numeric',year:a===new Date().getFullYear()?undefined:'numeric'})};
+
+// ---------- ui state ----------
+let v={n:S.onboarded?'pie':'onboard'}, ui={}, modal=null;
+let slide=0,flash=false,newp=null;
+const go=(n,x={})=>{newp=null;v=Object.assign({n},x);ui={};render();window.scrollTo(0,0)};
+const sl=id=>S.slices.find(s=>s.id===id);
+const pr=id=>S.projects.find(p=>p.id===id);
+const activeProjects=sid=>S.projects.filter(p=>p.sliceId===sid&&p.status==='active');
+const finishedProjects=sid=>S.projects.filter(p=>p.sliceId===sid&&p.status==='finished');
+const toast=m=>{const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2500)};
+const ask=(title,body,label,fn,red=true)=>{modal={title,body,label,fn,red};render()};
+const delExp=id=>{S.exps=S.exps.filter(e=>e.id!==id);S.entries=S.entries.filter(e=>e.expId!==id)};
+const delProject=id=>{S.exps.filter(e=>e.projectId===id).forEach(e=>delExp(e.id));S.projects=S.projects.filter(p=>p.id!==id)};
+const projExps=pid=>S.exps.filter(e=>e.projectId===pid);
+const countOf=id=>S.entries.filter(e=>e.expId===id).length;
+const projCrumb=()=>esc(sl(pr(v.p)?.sliceId)?.name||'')+' · Experiments';
+
+function openSlice(sid){
+  const act=activeProjects(sid);
+  if(!act.length){newp={s:sid};return render()}
+  const last=S.lastProj[sid];const p=act.find(x=>x.id===last)||act[0];
+  go('lab',{p:p.id});
+}
+function setProj(pid){S.lastProj[pr(pid).sliceId]=pid;save()}
+
+// ---------- views ----------
+const ENSO=(s=26)=>`<svg width="${s}" height="${s}" viewBox="0 0 40 40"><path d="M20 5 A15 15 0 1 1 9 11" stroke="#2C4A34" stroke-width="3" fill="none" stroke-linecap="round"/></svg>`;
+const FLASK=`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2C4A34" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M10 3v6l-5.5 9.5a1.5 1.5 0 0 0 1.3 2.2h12.4a1.5 1.5 0 0 0 1.3-2.2L14 9V3"/></svg>`;
+const BARS=`<svg width="16" height="16" viewBox="0 0 24 24" stroke="#2A2A28" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg>`;
+const TRASH=`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6h16Z"/></svg>`;
+const back=(a,t)=>`<button class="back" data-a="${a}">← ${t}</button>`;
+
+function vOnboard(){return `<div class="empty">${ENSO(54)}<h1 class="h2" style="font-size:26px;margin-top:22px">This app is about the process.</h1>
+<p class="sub" style="max-width:320px">The outcome you're after still gets written down — it just steps to the side, out of view. What stays in front of you is only ever the next small thing.</p>
+<button class="btn" data-a="onboardGo" style="max-width:300px">Let's go</button>
+<button class="link" data-a="why" style="margin-top:18px">Why does it work this way?</button></div>`}
+
+function vPie(){
+  const n=S.slices.length,C=2*Math.PI*88,slot=C/n,dash=slot*64/79;
+  const hr=new Date().getHours(),g=hr<12?'Good morning':hr<18?'Good afternoon':'Good evening';
+  const words=['','One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten'];
+  let circles='',labels='';
+  S.slices.forEach((s,i)=>{
+    const rot=-90+i*360/n,rad=rot*Math.PI/180;
+    circles+=`<circle class="seg" data-i="${i}" data-a="slice" data-id="${s.id}" cx="140" cy="140" r="88" stroke="${s.color}" stroke-dasharray="${dash.toFixed(2)} ${C.toFixed(2)}" transform="rotate(${rot.toFixed(2)} 140 140)"/>`;
+    const x=140+114*Math.cos(rad),y=140+114*Math.sin(rad)+3;
+    labels+=`<text class="lbl" data-i="${i}" x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="middle">${esc(s.name.trim().split(/\s+/)[0].toLowerCase())}</text>`;
+  });
+  return `<div class="row" style="margin-bottom:14px"><span style="display:flex;align-items:center;gap:8px">${ENSO(22)}<b class="serif" style="color:var(--moss)">Trials</b></span><button class="link faint" data-a="settings">Settings</button></div>
+  <h1 class="h1">${g}</h1><p class="sub">${words[n]||n} ${n===1?'area':'areas'}. Choose one to tend.</p>
+  <div style="display:flex;justify-content:center;margin:4px 0 14px"><svg viewBox="0 0 280 280" style="width:100%;max-width:300px">${circles}
+  <circle cx="140" cy="140" r="56" fill="#FBF8F1" pointer-events="none" style="filter:drop-shadow(0 4px 10px rgba(42,42,40,.14))"/>
+  <text pointer-events="none" x="140" y="133" text-anchor="middle" class="ring-t1">slices</text>
+  <text pointer-events="none" x="140" y="156" text-anchor="middle" class="ring-t2">${n}</text>${labels}</svg></div>
+  <div class="center"><button class="link faint" data-a="customize" style="font-size:12.5px">⚙ Customize Pie</button></div>`}
+
+function vStart(){const s=sl(v.s);return `${back('pie','Pie')}<div class="crumb">${esc(s.name)}</div>
+<h1 class="h2">What project are you working on?</h1><p class="sub">Just a name. It stays out of sight once you start.</p>
+<input id="pname" class="field" placeholder="e.g. Make 10k" autocomplete="off" maxlength="80"><button class="btn" data-a="startProject">Start</button>`}
+
+function carousel(p){
+  const act=activeProjects(p.sliceId),i=act.findIndex(x=>x.id===p.id),multi=act.length>1;
+  return `<div class="carousel"><span></span><div class="cc"><button class="arr" data-a="cprev" ${multi?'':'disabled'}>‹</button><div class="dots">${act.map((x,j)=>`<i class="${j===i?'on':''}"></i>`).join('')}</div><button class="arr" data-a="cnext" ${multi?'':'disabled'}>›</button></div><button class="plus" data-a="addProject" style="justify-self:end" aria-label="Add project">+</button></div>`}
+
+function vLab(){
+  const p=pr(v.p);const exps=projExps(p.id).filter(e=>e.status==='pending');
+  const sel=ui.sel;
+  let body;
+  if(!exps.length){
+    body=`<div class="labcard"><div class="row"><span class="row" style="gap:8px;justify-content:flex-start">${FLASK}<b class="serif">Today's Lab</b></span><button class="pill" data-a="addExp">+ Experiment</button></div>
+    <div class="center" style="padding:44px 0 20px"><div class="h2" style="margin-bottom:6px">What will you try today?</div><p class="sub">Keep it tiny and doable.</p><button class="btn dark" style="width:auto;padding:13px 24px" data-a="addExp">Add First Experiment</button></div></div><div class="grow"></div>`;
+  }else if(sel){
+    body=exps.map(e=>`<button class="list-row" data-a="selExp" data-id="${e.id}" style="width:100%;text-align:left"><span class="box ${sel.has(e.id)?'on':''}">${sel.has(e.id)?'✓':''}</span><span class="nm">${esc(e.name)}</span></button>`).join('')+
+    `<div class="grow"></div><button class="btn red" ${sel.size?'':'disabled'} data-a="delSelExp">Delete ${sel.size} selected</button><button class="link faint center" style="padding:14px" data-a="cancelSel">Cancel</button>`;
+  }else{
+    body=exps.map(e=>{
+      const hab=e.repeats;const n=countOf(e.id);
+      return `<div class="card ${hab?'habit':''}"><div class="row" style="align-items:flex-start"><div><div class="item-name">${esc(e.name)}</div>${hab?'<span class="badge">Habit</span>':''}</div><button class="icon-btn" data-a="delExp" data-id="${e.id}" aria-label="Delete">✕</button></div>
+      <div class="actions"><button class="did" data-a="did" data-id="${e.id}">${hab?'+ Log it':'✓ I did it'}</button><button class="adj" data-a="adjust" data-id="${e.id}">Adjust</button></div>
+      ${hab?`<button class="link" data-a="dates" data-id="${e.id}" style="display:block;width:100%;text-align:left;margin-top:12px;padding-top:10px;border-top:1px dashed var(--line)">Shown up <span class="${ui.pulse===e.id?'pulse':''}">${n}</span> ${n===1?'time':'times'}</button>`:''}</div>`}).join('')+'<div class="grow"></div>';
+  }
+  const menu=ui.menu?`<div class="menu"><button data-a="selMode">Select experiments to delete</button><button data-a="delAll" style="color:var(--red)">Delete all experiments</button><hr><button data-a="finish">Mark project as finished</button></div>`:'';
+  return `<div class="row"><button class="lab-icon" data-a="side" aria-label="Projects">${BARS}</button>
+  <span class="row" style="gap:8px"><button class="pill" data-a="addExp">+ Experiment</button><button class="lab-icon" data-a="menu" aria-label="More" style="font-weight:700">⋯</button></span></div>${menu}
+  <div style="margin-top:6px">${back('pie','Pie')}</div><div class="crumb" style="margin-top:2px">${projCrumb()}</div>${body}
+  ${sel?'':`<div class="nav" style="margin-top:14px"><button data-a="completed">Completed</button><button data-a="grat">Gratitude</button></div>${carousel(p)}`}`}
+
+function vAdd(){return `${back('lab','Lab')}<div class="crumb">${projCrumb()}</div><h1 class="h2">What will you try today?</h1><p class="sub">Keep it tiny and doable.</p>
+<input id="ename" class="field" placeholder="e.g. Read one page" autocomplete="off" maxlength="120"><button class="btn" data-a="saveExp">Add experiment</button>`}
+
+function vAdjust(){const e=S.exps.find(x=>x.id===v.e);const r=ui.rep??e.repeats;
+return `${back('lab','Cancel')}<div class="crumb">${projCrumb()}</div><h1 class="h2">Adjust this experiment</h1><p class="sub">Make it smaller, change it — whatever fits.</p>
+<input id="ename" class="field" value="${esc(e.name)}" maxlength="120">
+<button class="set" data-a="togRep"><span><b>Repeats</b><small>${r?'This is a habit card now — every “Log it” adds to Completed automatically.':'Turn on and this becomes a habit card that stays put. Every “Log it” adds to Completed automatically.'}</small></span><span class="toggle ${r?'on':''}"><i></i></span></button>
+${r?`<div class="card" style="margin-top:14px"><b style="font-weight:500">Mark done</b><p class="sub" style="margin:4px 0 12px;font-size:13px">Clears the card from the lab. Everything you've logged stays exactly as it is in Completed — nothing is deleted.</p><button class="btn out" data-a="doneNow">Mark done</button></div>`:''}
+<div style="height:16px"></div><button class="btn" data-a="saveAdjust">Save</button>`}
+
+function vDates(){const e=S.exps.find(x=>x.id===v.e);const ens=S.entries.filter(x=>x.expId===e.id).sort((a,b)=>b.date.localeCompare(a.date)||b.ts-a.ts);
+const n=ens.length;
+return `<div class="row">${back(v.from||'lab','Back')}<button class="icon-btn" data-a="pencilSet" aria-label="Pencil settings">⚙</button></div>
+<h1 class="h2" style="margin-top:6px">${esc(e.name)}</h1><div class="crumb" style="margin-top:0">${esc(sl(pr(e.projectId).sliceId).name)} · ${n} ${n===1?'time':'times'}</div>
+${e.reflect?`<div class="card"><div class="meta" style="margin:0 0 4px">Something I've noticed about myself since starting this…</div><textarea id="overall" class="field small" rows="3" style="margin-top:4px" placeholder="I'm someone who…">${esc(e.overall||'')}</textarea><button class="link" data-a="saveOverall" style="margin-top:8px">Save</button></div>`:''}
+${ens.map(x=>`<div class="list-row"><div class="grow"><div class="nm" style="font-size:14.5px">${dayLabel(x.date)}</div>${x.words&&ui.edit!==x.id?`<div class="words">${esc(x.words)}</div>`:''}
+${ui.edit===x.id?`<input id="w-${x.id}" class="field small" placeholder="I'm someone who…" value="${esc(x.words||'')}" maxlength="200"><button class="link" data-a="saveWords" data-id="${x.id}" style="margin-top:6px">Save</button>`:''}</div>
+${e.pencilDates?`<button class="icon-btn" data-a="editWords" data-id="${x.id}" style="border:none">✎</button>`:''}<button class="icon-btn" style="border:none" data-a="delEntry" data-id="${x.id}" aria-label="Delete">${TRASH}</button></div>`).join('')}
+${e.status==='doneForNow'?'<div style="margin-top:20px"><button class="btn out" data-a="bringBack">Bring back to the lab</button></div>':''}
+<p class="meta center" style="margin-top:22px;line-height:1.6">${e.pencilDates?'Tap the pencil next to a date to add your own words.':'Just dates by default. The ⚙ turns on pencils, if wanted.'}</p>`}
+
+function vPencil(){const e=S.exps.find(x=>x.id===v.e);const t=ui.t||{reflect:!!e.reflect,pd:!!e.pencilDates};
+const row=(k,a,b)=>`<button class="set" data-a="tp" data-k="${k}"><span><b>${a}</b><small>${b}</small></span><span class="toggle ${t[k]?'on':''}"><i></i></span></button>`;
+return `<button class="back" data-a="dates" data-id="${e.id}" data-from="${v.from||'lab'}">← Back</button><h1 class="h2" style="margin-top:6px">Pencil settings</h1><p class="sub">Optional. Only if it feels useful.</p>
+${row('reflect','Reflect overall','One field about the habit as a whole.')}${row('pd','Pencil on each date','Adds a pencil next to every date.')}<div style="height:18px"></div><button class="btn" data-a="savePencil">Save</button>`}
+
+function vCompleted(){
+  const p=pr(v.p);const ex=projExps(p.id);
+  const hab=ex.filter(e=>e.repeats&&countOf(e.id)).sort((a,b)=>lastTouch(b.id)-lastTouch(a.id));
+  const hist=S.entries.filter(en=>{const e=ex.find(x=>x.id===en.expId);return e&&!e.repeats}).sort((a,b)=>b.date.localeCompare(a.date)||b.ts-a.ts);
+  const groups={};hist.forEach(h=>(groups[h.date]=groups[h.date]||[]).push(h));
+  const ro=v.ro;
+  const wordsEdit=(key,val,saveA,id)=>ui.edit===key?`<input id="w-${key}" class="field small" placeholder="I'm someone who…" value="${esc(val||'')}" maxlength="200"><button class="link" data-a="${saveA}" data-id="${id}" style="margin-top:6px">Save</button>`:(val?`<div class="words">${esc(val)}</div>`:'');
+  return `${back(ro?'finished':'lab','Lab')}<h1 class="h2" style="margin-top:6px">Completed</h1><div class="crumb" style="margin-top:0">Experiments</div>
+  ${!hab.length&&!hist.length?'<p class="sub center" style="padding:40px 0">Nothing here yet. When you tap “I did it”, it lands here.</p>':''}
+  ${hab.length?`<div class="sec" style="margin-top:0">Habits</div>${hab.map(e=>`<div class="list-row"><span class="chk">✓</span><button class="grow" data-a="dates" data-id="${e.id}" data-from="completed" style="text-align:left"><div class="nm">${esc(e.name)}</div><div class="meta">${countOf(e.id)} ${countOf(e.id)===1?'time':'times'}${e.status==='doneForNow'?' · Done':''}</div>${ui.edit!==e.id&&e.overall?`<div class="words">${esc(e.overall)}</div>`:''}</button>${ro?'':`<button class="icon-btn" style="border:none" data-a="editWords" data-id="${e.id}" data-ex="1">✎</button><button class="icon-btn" style="border:none" data-a="delHabit" data-id="${e.id}">${TRASH}</button>`}</div>${ui.edit===e.id?`<div style="padding:0 0 12px 30px">${wordsEdit(e.id,e.overall,'saveOverallRow',e.id)}</div>`:''}`).join('')}`:''}
+  ${hist.length?`<div class="sec">One-time</div>${Object.keys(groups).sort().reverse().map(d=>`<div class="sub2">${dayLabel(d)}</div>${groups[d].map(h=>{const e=ex.find(x=>x.id===h.expId);return `<div class="list-row" style="align-items:flex-start"><span class="chk" style="margin-top:2px">✓</span><div class="grow"><div class="nm">${esc(e.name)}</div><div class="meta">${dayLabel(h.date)}</div>${wordsEdit(h.id,h.words,'saveWords',h.id)}</div>${ro?'':`<button class="icon-btn" style="border:none" data-a="editWords" data-id="${h.id}">✎</button><button class="icon-btn" style="border:none" data-a="delEntry" data-id="${h.id}">${TRASH}</button>`}</div>`}).join('')}`).join('')}`:''}
+  ${hab.length||hist.length?'<p class="meta center" style="margin-top:20px">Tap a habit to see its dates, or the pencil for your own words.</p>':''}`}
+const lastTouch=id=>Math.max(0,...S.entries.filter(e=>e.expId===id).map(e=>e.ts||0));
+
+function vGrat(){return `${back('lab','Lab')}<h1 class="h2" style="margin-top:6px">Gratitude</h1><div style="height:8px"></div>
+${ui.gadd?`<textarea id="gtext" class="field" rows="3" placeholder="I'm grateful for…" maxlength="300"></textarea><button class="btn" data-a="saveGrat">Save</button><div style="height:14px"></div>`:`<button class="btn dark" data-a="gadd">🤍 What are you grateful for?</button><div style="height:14px"></div>`}
+${S.gratitude.slice().reverse().map(g=>`<div class="card"><div class="row" style="align-items:flex-start"><div class="serif" style="font-style:italic;font-size:15px;line-height:1.55">${esc(g.text)}</div><button class="icon-btn" style="border:none" data-a="delGrat" data-id="${g.id}">✕</button></div><div class="meta" style="margin-top:6px">${dayLabel(g.date)}</div></div>`).join('')}
+<p class="meta center" style="margin-top:14px">What's one good thing from today?</p>`}
+
+function vSettings(){const b=S.backup;const days=b?Math.max(1,Math.ceil((b.expiresAt-Date.now())/864e5)):0;
+return `${back('pie','Pie')}<h1 class="h2" style="margin-top:6px">Settings</h1><div style="height:6px"></div>
+<button class="set" data-a="togFin"><span><b>Show Finished Projects</b><small>Controls both the full list and whether finished projects appear in each slice's sidebar. Off by default.</small></span><span class="toggle ${S.showFinished?'on':''}"><i></i></span></button>
+<button class="set" data-a="togFlash"><span><b>Show project name when switching</b><small>A quick flash of the project's name when you swipe or tap the arrows, so you know where you landed. Turn off to keep names fully hidden.</small></span><span class="toggle ${S.flashName?'on':''}"><i></i></span></button>
+${S.showFinished?`<button class="set" data-a="finAll"><b>Finished projects</b><span class="link">Open</span></button>`:''}
+<button class="set" data-a="customize"><b>Manage your pie</b><span class="link">Open</span></button>
+<button class="set" data-a="why"><b>Why Trials works this way</b><span class="link">Open</span></button>
+${b?`<div class="card" style="margin-top:14px"><b style="font-weight:500">Restore previous pie</b><p class="sub" style="margin:4px 0 12px;font-size:13px">${days} days left before it's gone for good.</p><div class="actions" style="margin:0"><button class="did" data-a="restore">Restore</button><button class="adj" data-a="delBackup" style="color:var(--red);border-color:var(--red)">Delete now</button></div></div>`:''}
+<div class="sec">Your data</div><p class="meta" style="margin:4px 0 12px;line-height:1.6;font-size:12.5px">Everything is saved on this device only. If you clear your browser data it's gone — so download a backup now and then.</p>
+<div class="actions" style="margin:0"><button class="btn out" data-a="export">Download backup</button><label class="btn out" style="cursor:pointer">Restore from file<input type="file" id="imp" accept=".json,application/json" style="display:none"></label></div>`}
+
+function vFinished(){const list=S.projects.filter(p=>p.status==='finished');
+return `${back('settings','Settings')}<h1 class="h2" style="margin-top:6px">Finished projects</h1>${!list.length?'<p class="sub">Nothing here yet.</p>':''}
+${list.map(p=>`<button class="list-row" data-a="openFinished" data-id="${p.id}" style="width:100%;text-align:left"><span class="dot"></span><span class="nm">${esc(p.name)}</span><span class="meta" style="margin:0 0 0 auto">${esc(sl(p.sliceId)?.name||'')}</span></button>`).join('')}`}
+
+function vFinLab(){const p=pr(v.p);return `${back('finished','Finished')}<div class="crumb">${esc(sl(p.sliceId)?.name||'')} · Finished</div><h1 class="h2">Completed Lab</h1><p class="sub">${esc(p.name)} is finished. It's read-only here.</p>
+<button class="btn out" data-a="completedRO">View Completed</button><div style="height:10px"></div><button class="btn" data-a="reopen">Bring this project back</button>`}
+
+function vCustom(){
+  const rows=S.slices.map(s=>{const act=activeProjects(s.id).length;return `<div class="prow"><button class="swatch" style="background:${s.color}" data-a="pal" data-id="${s.id}" aria-label="Color"></button>
+  <input data-a="rename" data-id="${s.id}" value="${esc(s.name)}" maxlength="24">${act?`<span class="meta" style="margin:0;text-align:right;color:var(--clay)">${act} active<br>project</span>`:''}<button class="icon-btn" ${act?'style="opacity:.35"':''} data-a="delSlice" data-id="${s.id}">✕</button></div>
+  ${ui.pal===s.id?`<div class="pal">${PAL.map(c=>`<button style="background:${c}" data-a="color" data-id="${s.id}" data-c="${c}"></button>`).join('')}</div>`:''}`}).join('');
+  return `<h1 class="h2" style="margin-top:14px">Customize Your Pie</h1><p class="sub">Rename a slice or pick a new color. Nothing here is required.</p>${rows}
+  <div style="display:flex;gap:10px;margin-top:6px"><button class="link" data-a="addSlice" style="flex:1;border:1.4px dashed var(--line);border-radius:var(--r-lg);padding:15px">+ Add Slice</button><button class="link faint" data-a="reset" style="flex:1;border:1.4px dashed var(--line);border-radius:var(--r-lg);padding:15px">↺ Reset</button></div>
+  <div class="grow"></div>${S.slices.some(s=>activeProjects(s.id).length)?'<p class="meta center" style="margin:18px 0 0">A slice with active work can’t be removed — mark its project finished first.</p>':''}
+  <div class="row" style="margin-top:18px"><button class="link faint" data-a="cancelCustom" style="font-size:14px;padding:10px 4px">Cancel</button><button class="btn dark" data-a="saveCustom" style="width:auto;padding:13px 38px">Save</button></div>`}
+
+function vWhy(){return `<div class="why">${back(v.from||'pie','Back')}<h1 class="h2" style="margin-top:6px">Why Trials works this way</h1>
+<h3>Why we hide your goal.</h3><p>A big goal you can see every day creates a gap between where you are and where you want to be — and that gap is what makes people feel behind, not the goal itself. Once it's written down, we tuck it away. Nothing left to measure yourself against.</p>
+<h3>Why this app is about actions, not outcomes.</h3><p>The goal isn't something you're secretly working toward in the background — it's meant to actually leave your mind. What's left is just the next experiment.</p>
+<h3>Why we encourage small steps.</h3><p>Confidence isn't built by attempting hard things — it's built by a track record of actually doing them. The more doable a step is, the more likely you are to actually finish it — and that's what adds up.</p>
+<h3>Why the pencil in Completed.</h3><p>Every action is evidence of who you're becoming, not proof of how far you have left to go. The pencil lets you name that in your own words — which sticks more than anything the app could say for you.</p>
+<h3>Why experiments work two ways.</h3><p>Most things you add are one-time — do it once, tap “I did it,” and it goes straight into Completed. Some things you'll want to keep showing up for. Turn on Repeats in Adjust and the card stays put, with a “Log it” button that adds to a quiet count. “Mark done” sends it away — nothing is deleted, and you can bring it back any time.</p></div>`}
+
+function sidebar(){
+  const p=pr(v.p);const act=activeProjects(p.sliceId);const sel=ui.psel;
+  const show=S.reveal||!!sel;
+  const fin=S.showFinished?finishedProjects(p.sliceId):[];
+  return `<div class="side"><div class="pane"><div class="row" style="margin-bottom:6px"><span class="meta" style="margin:0;font-size:13px">${sel?'':esc(sl(p.sliceId).name)}</span><button class="icon-btn" style="border:none" data-a="sideclose" aria-label="Close">✕</button></div>
+  <div class="row" style="margin-bottom:16px"><b class="serif" style="font-size:24px;font-weight:500">${sel?'Select projects':'Projects'}</b>${sel?`<button class="link" data-a="pall">Select all</button>`:(show?`<button class="link" data-a="psel">Select</button>`:'')}</div>
+  ${act.map(x=>`<div class="row" style="gap:4px;margin-bottom:6px"><button class="sitem ${x.id===p.id&&!sel?'act':''}" style="margin:0;background:${x.id===p.id&&!sel?'var(--washi)':'rgba(251,248,241,.55)'}" data-a="${sel?'ptog':'pgo'}" data-id="${x.id}">${show?esc(x.name):'&nbsp;'}</button>
+  ${sel?`<button data-a="ptog" data-id="${x.id}" style="padding:8px"><span class="box ${sel.has(x.id)?'on':''}">${sel.has(x.id)?'✓':''}</span></button>`:(show?`<button class="icon-btn" style="border:none" data-a="prename" data-id="${x.id}" aria-label="Rename">✎</button><button class="icon-btn" style="border:none" data-a="pdelone" data-id="${x.id}" aria-label="Delete">${TRASH}</button>`:'')}</div>`).join('')}
+  ${sel?`<div style="height:10px"></div><button class="btn red" ${sel.size?'':'disabled'} data-a="pdel">Delete ${sel.size} selected</button><div class="center"><button class="link faint" data-a="pcancel" style="padding:14px">Cancel</button></div>`:`<button class="sitem" data-a="addProject" style="color:var(--moss);margin-top:4px;border:1.4px dashed var(--line);justify-content:center">+ Add project</button><button class="link" data-a="reveal" style="margin:10px 0 0 4px;padding:6px 0">${S.reveal?'Hide':'Show'} project names</button>`}
+  ${fin.length&&!sel?`<div class="sec">Finished Projects</div>${fin.map(x=>`<button class="sitem" data-a="openFinished" data-id="${x.id}"><span class="dot"></span>${show?esc(x.name):''}</button>`).join('')}`:''}
+  </div><div class="shade" data-a="sideclose"></div></div>`}
+
+function vRename(){const p=pr(v.p);return `${back('lab','Cancel')}<h1 class="h2" style="margin-top:6px">Rename this project</h1><input id="pname" class="field" value="${esc(p.name)}" maxlength="80"><button class="btn" data-a="saveRename">Save</button>`}
+
+const VIEWS={onboard:vOnboard,pie:vPie,start:vStart,lab:vLab,addExp:vAdd,adjust:vAdjust,dates:vDates,pencil:vPencil,completed:vCompleted,grat:vGrat,settings:vSettings,finished:vFinished,finlab:vFinLab,custom:vCustom,why:vWhy,rename:vRename};
+function render(){
+  const root=document.getElementById('app');
+  root.innerHTML=VIEWS[v.n]()+(ui.side?sidebar():'')+(newp?`<div class="overlay" data-a="cancelNewBg"><div class="modal" style="padding:24px"><h2 class="h2" style="font-size:20px">What project are you working on?</h2><p style="margin:2px 0 4px">Just a name. It stays out of sight once you start.</p><input id="pname" class="field" placeholder="e.g. Make 10k" autocomplete="off" maxlength="80" style="margin-bottom:14px"><div class="two"><button class="btn out" data-a="cancelNew" style="flex:1">Cancel</button><button class="btn" data-a="startProject" style="flex:1">Start</button></div></div></div>`:'')+(modal?`<div class="overlay"><div class="modal"><h2 class="h2" style="font-size:19px">${esc(modal.title)}</h2><p>${esc(modal.body)}</p><div class="two"><button class="btn out" data-a="mno" style="flex:1">Cancel</button><button class="btn ${modal.red?'red':''}" data-a="myes" style="flex:1">${esc(modal.label)}</button></div></div></div>`:'');
+  if(slide){root.animate([{transform:`translateX(${slide*34}px)`,opacity:.35},{transform:'none',opacity:1}],{duration:220,easing:'ease-out'});slide=0}
+  if(flash){flash=false;if(S.flashName&&v.n==='lab'&&pr(v.p)){const d=document.createElement('div');d.className='flash';d.textContent=pr(v.p).name;document.body.appendChild(d);setTimeout(()=>d.remove(),1500)}}
+  const f=root.querySelector('#pname,#ename,#gtext');if(f&&!/iPhone|iPad|Android/.test(navigator.userAgent))f.focus();
+  const imp=root.querySelector('#imp');if(imp)imp.onchange=importFile;
+}
+
+// ---------- actions ----------
+const val=id=>(document.getElementById(id)?.value||'').trim();
+const A={
+  onboardGo(){S.onboarded=true;save();go('pie')},
+  why(d){go('why',{from:v.n==='onboard'?'onboard':v.n==='settings'?'settings':'pie'})},
+  pie(){go('pie')},
+  onboard(){go('onboard')},
+  settings(){go('settings')},
+  slice(d){openSlice(d.id)},
+  startProject(){const n=val('pname');if(!n)return;const sid=newp?newp.s:v.s;const p={id:uid(),sliceId:sid,name:n,status:'active'};S.projects.push(p);S.lastProj[sid]=p.id;save();go('lab',{p:p.id})},
+  cancelNewBg(d){ },
+  cancelNew(){newp=null;render()},
+  addProject(){ui.side=false;ui.menu=false;newp={s:pr(v.p).sliceId};render()},
+  lab(){go('lab',{p:v.p})},
+  cprev(){slide=-1;flash=true;const act=activeProjects(pr(v.p).sliceId);if(act.length<2)return;const i=act.findIndex(x=>x.id===v.p);setProj(act[(i-1+act.length)%act.length].id);go('lab',{p:S.lastProj[pr(v.p).sliceId]})},
+  cnext(){slide=1;flash=true;const act=activeProjects(pr(v.p).sliceId);if(act.length<2)return;const i=act.findIndex(x=>x.id===v.p);setProj(act[(i+1)%act.length].id);go('lab',{p:S.lastProj[pr(v.p).sliceId]})},
+  addExp(){go('addExp',{p:v.p})},
+  saveExp(){const n=val('ename');if(!n)return;S.exps.push({id:uid(),projectId:v.p,name:n,repeats:false,status:'pending'});save();go('lab',{p:v.p})},
+  did(d){const e=S.exps.find(x=>x.id===d.id);S.entries.push({id:uid(),expId:e.id,date:today(),ts:Date.now(),words:''});if(!e.repeats)e.status='done';save();toast('Logged');const p=v.p;v={n:'lab',p};ui={pulse:e.repeats?e.id:null};render()},
+  delExp(d){const e=S.exps.find(x=>x.id===d.id);ask(e.repeats?'Delete this habit?':'Delete this experiment?',e.repeats?`“${e.name}” and everything logged under it in Completed — every date, every word you wrote — will be gone for good. This can't be undone.`:`“${e.name}” will be removed. Nothing is logged.`,'Delete',()=>{delExp(e.id);save()})},
+  adjust(d){go('adjust',{p:v.p,e:d.id})},
+  togRep(){const e=S.exps.find(x=>x.id===v.e);const keep=val('ename');ui.rep=!(ui.rep??e.repeats);ui.name=keep;render();document.getElementById('ename').value=keep},
+  saveAdjust(){const e=S.exps.find(x=>x.id===v.e);const n=val('ename');if(n)e.name=n;e.repeats=ui.rep??e.repeats;save();go('lab',{p:v.p})},
+  doneNow(){const e=S.exps.find(x=>x.id===v.e);e.status='doneForNow';save();toast('Marked done — still in Completed');go('lab',{p:v.p})},
+  dates(d){const e=S.exps.find(x=>x.id===d.id);go('dates',{p:e.projectId,e:e.id,from:d.from||'lab'})},
+  bringBack(){const e=S.exps.find(x=>x.id===v.e);e.status='pending';save();toast('Back in the lab');go('lab',{p:e.projectId})},
+  pencilSet(){go('pencil',{p:v.p,e:v.e,from:v.from})},
+  tp(d){const e=S.exps.find(x=>x.id===v.e);ui.t=ui.t||{reflect:!!e.reflect,pd:!!e.pencilDates};ui.t[d.k]=!ui.t[d.k];render()},
+  savePencil(){const e=S.exps.find(x=>x.id===v.e);const t=ui.t||{reflect:!!e.reflect,pd:!!e.pencilDates};e.reflect=t.reflect;e.pencilDates=t.pd;save();go('dates',{p:v.p,e:v.e,from:v.from})},
+  saveOverall(){const e=S.exps.find(x=>x.id===v.e);e.overall=val('overall');save();toast('Saved')},
+  editWords(d){ui.edit=d.id;render()},
+  saveWords(d){const en=S.entries.find(x=>x.id===d.id);en.words=val('w-'+d.id);save();ui.edit=null;render()},
+  saveOverallRow(d){const e=S.exps.find(x=>x.id===d.id);e.overall=val('w-'+d.id);save();ui.edit=null;render()},
+  delEntry(d){ask('Delete this?','This removes it from Completed for good. This can\'t be undone.','Delete',()=>{const en=S.entries.find(x=>x.id===d.id);const e=S.exps.find(x=>x.id===en.expId);S.entries=S.entries.filter(x=>x.id!==d.id);if(e&&!e.repeats&&e.status==='done'&&!countOf(e.id))S.exps=S.exps.filter(x=>x.id!==e.id);save()})},
+  delHabit(d){ask('Delete this?','This removes it from Completed for good — including every date logged under it. This can\'t be undone.','Delete',()=>{delExp(d.id);save()})},
+  completed(){go('completed',{p:v.p})},
+  completedRO(){go('completed',{p:v.p,ro:true})},
+  grat(){go('grat',{p:v.p})},
+  gadd(){ui.gadd=true;render()},
+  saveGrat(){const t=val('gtext');if(!t)return;S.gratitude.push({id:uid(),text:t,date:today()});save();ui.gadd=false;render()},
+  delGrat(d){ask('Delete this?','This can\'t be undone.','Delete',()=>{S.gratitude=S.gratitude.filter(g=>g.id!==d.id);save()})},
+  menu(){ui.menu=!ui.menu;render()},
+  selMode(){ui.menu=false;ui.sel=new Set();render()},
+  selExp(d){ui.sel.has(d.id)?ui.sel.delete(d.id):ui.sel.add(d.id);render()},
+  cancelSel(){ui.sel=null;render()},
+  delSelExp(){const ids=[...ui.sel];ask(`Delete ${ids.length} experiment${ids.length>1?'s':''}?`,'Everything selected — including any habit cards and everything logged for them in Completed — will be gone. This can\'t be undone.','Delete',()=>{ids.forEach(delExp);save();ui.sel=null})},
+  delAll(){ui.menu=false;const p=pr(v.p);ask('Delete all experiments?',`Every experiment under “${p.name}” — including any habit cards and everything logged in Completed for them — will be gone. This can't be undone.`,'Delete all',()=>{projExps(p.id).forEach(e=>delExp(e.id));save()})},
+  finish(){const p=pr(v.p);p.status='finished';save();toast('Moved to Finished Projects');const act=activeProjects(p.sliceId);if(act.length){S.lastProj[p.sliceId]=act[0].id;save();go('lab',{p:act[0].id})}else go('pie')},
+  side(){ui.side=true;render()},sideclose(){ui.side=false;ui.psel=null;render()},
+  reveal(){S.reveal=!S.reveal;save();render()},
+  pdelone(d){const x=pr(d.id);ask('Delete this project?',`“${x.name}” and everything in it — every experiment, any habit cards, all of it logged in Completed — will be gone for good. This can't be undone.`,'Delete',()=>{const sid=x.sliceId,was=v.p===x.id;delProject(x.id);save();const act=activeProjects(sid);if(act.length){S.lastProj[sid]=act[0].id;v={n:'lab',p:act[0].id}}else{ui.side=false;v={n:'start',s:sid}}})},
+  pgo(d){setProj(d.id);go('lab',{p:d.id})},
+  prename(d){go('rename',{p:d.id})},
+  saveRename(){const n=val('pname');if(n){pr(v.p).name=n;save()}go('lab',{p:v.p})},
+  psel(){ui.psel=new Set();render()},pcancel(){ui.psel=null;render()},
+  ptog(d){ui.psel.has(d.id)?ui.psel.delete(d.id):ui.psel.add(d.id);render()},
+  pall(){activeProjects(pr(v.p).sliceId).forEach(x=>ui.psel.add(x.id));render()},
+  pdel(){const ids=[...ui.psel];const names=ids.map(i=>pr(i).name);ask(`Delete ${ids.length} project${ids.length>1?'s':''}?`,`${ids.length>1?'These projects':'“'+names[0]+'”'} and everything in it — every experiment, any habit cards, all of it logged in Completed — will be gone for good. This can't be undone.`,'Delete',()=>{const sid=pr(v.p).sliceId;ids.forEach(delProject);save();ui.side=false;ui.psel=null;const act=activeProjects(sid);if(act.length){S.lastProj[sid]=act[0].id;v={n:'lab',p:act[0].id}}else v={n:'start',s:sid}})},
+  finAll(){go('finished')},
+  openFinished(d){go('finlab',{p:d.id})},
+  reopen(){const p=pr(v.p);p.status='active';S.lastProj[p.sliceId]=p.id;save();toast('Project is back');go('lab',{p:p.id})},
+  finished(){go('finished')},
+  togFlash(){S.flashName=!S.flashName;save();render()},
+  togFin(){S.showFinished=!S.showFinished;save();render()},
+  customize(){const snap=JSON.stringify(S.slices);go('custom',{snap,from:v.n})},
+  cancelCustom(){S.slices=JSON.parse(v.snap);save();go(v.from==='settings'?'settings':'pie')},
+  saveCustom(){save();go(v.from==='settings'?'settings':'pie')},
+  pal(d){ui.pal=ui.pal===d.id?null:d.id;render()},
+  color(d){sl(d.id).color=d.c;save();ui.pal=null;render()},
+  addSlice(){S.slices.push({id:uid(),name:'New slice',color:PAL[S.slices.length%7],isDefault:false});save();render();const i=document.querySelectorAll('.prow input');const l=i[i.length-1];l&&(l.focus(),l.select())},
+  delSlice(d){const s=sl(d.id);if(activeProjects(s.id).length){toast('Mark its project finished first');return}if(S.slices.length<=1){toast('Keep at least one slice');return}ask('Remove this slice?',`“${s.name}” will be removed.`,'Remove',()=>{S.slices=S.slices.filter(x=>x.id!==s.id);save()})},
+  reset(){ask('Reset to the default 7?','Any slices you\'ve added or renamed will be removed, along with everything inside them — projects, hidden goals, history. Your current setup will be kept for 30 days in case you change your mind, then deleted for good.','Reset',()=>{
+    S.backup={slices:S.slices,projects:S.projects,exps:S.exps,entries:S.entries,lastProj:S.lastProj,expiresAt:Date.now()+30*864e5};
+    S.slices=JSON.parse(JSON.stringify(DEF));const ids=new Set(S.slices.map(s=>s.id));
+    const keepP=S.projects.filter(p=>ids.has(p.sliceId));const kp=new Set(keepP.map(p=>p.id));
+    S.projects=keepP;const ke=S.exps.filter(e=>kp.has(e.projectId));const kx=new Set(ke.map(e=>e.id));S.exps=ke;S.entries=S.entries.filter(e=>kx.has(e.expId));
+    save();toast('Pie reset')})},
+  restore(){const b=S.backup;if(!b)return;S.slices=b.slices;S.projects=b.projects;S.exps=b.exps;S.entries=b.entries;S.lastProj=b.lastProj||{};S.backup=null;save();toast('Previous pie restored');render()},
+  delBackup(){ask('Delete for good?','Your previous pie and everything in it will be gone permanently, with no 30-day window.','Delete now',()=>{S.backup=null;save()})},
+  export(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(S,null,1)],{type:'application/json'}));a.download='trials-backup-'+today()+'.json';a.click()},
+  mno(){modal=null;render()},
+  myes(){const m=modal;modal=null;m.fn();ui.menu=false;render()},
+};
+function importFile(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(!d.slices||!d.projects)throw 0;ask('Replace everything on this device?','This swaps your current data for the backup file.','Restore',()=>{S=Object.assign(fresh(),d);save()},false)}catch(x){toast('That file isn\'t a Trials backup')}};r.readAsText(f)}
+
+document.addEventListener('click',ev=>{
+  if(newp&&ev.target.classList&&ev.target.classList.contains('overlay')){newp=null;render();return}
+  const el=ev.target.closest('[data-a]');
+  if(!el){if(ui.menu){ui.menu=false;render()}return}
+  if(el.tagName==='INPUT')return;
+  if(ui.menu&&el.dataset.a!=='menu'&&!el.closest('.menu')){ui.menu=false}
+  const f=A[el.dataset.a];if(f)f(el.dataset);
+  if(!['myes'].includes(el.dataset.a)&&0)render();
+});
+document.addEventListener('input',ev=>{const t=ev.target;if(t.dataset&&t.dataset.a==='rename'){sl(t.dataset.id).name=t.value||'Slice';save()}});
+document.addEventListener('keydown',ev=>{if(ev.key==='Enter'&&ev.target.tagName==='INPUT'){const b=document.querySelector('.overlay .btn:not(.out)')||document.querySelector('.btn:not(.out):not(.dark)');if(b&&ev.target.id)b.click()}});
+let tx=null;document.addEventListener('touchstart',e=>{tx=e.target.closest('input,textarea')?null:e.touches[0].clientX},{passive:true});
+document.addEventListener('touchend',e=>{if(tx==null||v.n!=='lab'||ui.sel||ui.side||modal)return;const dx=e.changedTouches[0].clientX-tx;tx=null;if(Math.abs(dx)>70)A[dx<0?'cnext':'cprev']()},{passive:true});
+const hot=(e,on)=>{const c=e.target.closest&&e.target.closest('.seg');if(!c)return;const l=document.querySelector('.lbl[data-i="'+c.dataset.i+'"]');l&&l.classList.toggle('hot',on)};
+document.addEventListener('mouseover',e=>hot(e,true));document.addEventListener('mouseout',e=>hot(e,false));
+// rename input blur → re-render
+document.addEventListener('focusout',ev=>{if(ev.target.dataset&&ev.target.dataset.a==='rename'&&!ev.target.value.trim()){ev.target.value=sl(ev.target.dataset.id).name}});
+render();
+</script>
+</body>
+</html>
