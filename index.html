@@ -111,7 +111,7 @@ const KEY='trials.v1';
 const PAL=['#35573F','#3F657A','#AD8038','#96525F','#664F82','#357569','#855C38'];
 const DEF=[['Physical Health',0],['Career',1],['Finance',2],['Relationships',3],['Hobbies',4],['Mental Health',5],['Spiritual Health',6]]
   .map((d,i)=>({id:'s'+(i+1),name:d[0],color:PAL[d[1]],isDefault:true}));
-const fresh=()=>({onboarded:false,slices:JSON.parse(JSON.stringify(DEF)),projects:[],exps:[],entries:[],gratitude:[],showFinished:false,backup:null,lastProj:{},reveal:false,flashName:true});
+const fresh=()=>({onboarded:false,slices:JSON.parse(JSON.stringify(DEF)),projects:[],exps:[],entries:[],gratitude:[],showFinished:false,backup:null,lastProj:{},reveal:false,hideNames:false,flashName:true});
 let S;
 try{S=JSON.parse(localStorage.getItem(KEY))||fresh()}catch(e){S=fresh()}
 S=Object.assign(fresh(),S);
@@ -289,25 +289,44 @@ function vWhy(){return `<div class="why">${back(v.from||'pie','Back')}<h1 class=
 
 function sidebar(){
   const p=pr(v.p);const act=activeProjects(p.sliceId);const sel=ui.psel;
-  const show=S.reveal||!!sel;
+  const show=!S.hideNames||!!sel;
   const fin=S.showFinished?finishedProjects(p.sliceId):[];
   return `<div class="side"><div class="pane"><div class="row" style="margin-bottom:6px"><span class="meta" style="margin:0;font-size:13px">${sel?'':esc(sl(p.sliceId).name)}</span><button class="icon-btn" style="border:none" data-a="sideclose" aria-label="Close">✕</button></div>
   <div class="row" style="margin-bottom:16px"><b class="serif" style="font-size:24px;font-weight:500">${sel?'Select projects':'Projects'}</b>${sel?`<button class="link" data-a="pall">Select all</button>`:(show?`<button class="link" data-a="psel">Select</button>`:'')}</div>
   ${act.map(x=>`<div class="row" style="gap:4px;margin-bottom:6px"><button class="sitem ${x.id===p.id&&!sel?'act':''}" style="margin:0;background:${x.id===p.id&&!sel?'var(--washi)':'rgba(251,248,241,.55)'}" data-a="${sel?'ptog':'pgo'}" data-id="${x.id}">${show?esc(x.name):'&nbsp;'}</button>
   ${sel?`<button data-a="ptog" data-id="${x.id}" style="padding:8px"><span class="box ${sel.has(x.id)?'on':''}">${sel.has(x.id)?'✓':''}</span></button>`:(show?`<button class="icon-btn" style="border:none" data-a="prename" data-id="${x.id}" aria-label="Rename">✎</button><button class="icon-btn" style="border:none" data-a="pdelone" data-id="${x.id}" aria-label="Delete">${TRASH}</button>`:'')}</div>`).join('')}
-  ${sel?`<div style="height:10px"></div><button class="btn red" ${sel.size?'':'disabled'} data-a="pdel">Delete ${sel.size} selected</button><div class="center"><button class="link faint" data-a="pcancel" style="padding:14px">Cancel</button></div>`:`<button class="sitem" data-a="addProject" style="color:var(--moss);margin-top:4px;border:1.4px dashed var(--line);justify-content:center">+ Add project</button><button class="link" data-a="reveal" style="margin:10px 0 0 4px;padding:6px 0">${S.reveal?'Hide':'Show'} project names</button>`}
+  ${sel?`<div style="height:10px"></div><button class="btn red" ${sel.size?'':'disabled'} data-a="pdel">Delete ${sel.size} selected</button><div class="center"><button class="link faint" data-a="pcancel" style="padding:14px">Cancel</button></div>`:`<button class="sitem" data-a="addProject" style="color:var(--moss);margin-top:4px;border:1.4px dashed var(--line);justify-content:center">+ Add project</button><button class="link" data-a="reveal" style="margin:10px 0 0 4px;padding:6px 0">${S.hideNames?'Show':'Hide'} project names</button>`}
   ${fin.length&&!sel?`<div class="sec">Finished Projects</div>${fin.map(x=>`<button class="sitem" data-a="openFinished" data-id="${x.id}"><span class="dot"></span>${show?esc(x.name):''}</button>`).join('')}`:''}
   </div><div class="shade" data-a="sideclose"></div></div>`}
 
 function vRename(){const p=pr(v.p);return `${back('lab','Cancel')}<h1 class="h2" style="margin-top:6px">Rename this project</h1><input id="pname" class="field" value="${esc(p.name)}" maxlength="80"><button class="btn" data-a="saveRename">Save</button>`}
 
 const VIEWS={onboard:vOnboard,pie:vPie,start:vStart,lab:vLab,addExp:vAdd,adjust:vAdjust,dates:vDates,pencil:vPencil,completed:vCompleted,grat:vGrat,settings:vSettings,finished:vFinished,finlab:vFinLab,custom:vCustom,why:vWhy,rename:vRename};
+
+// ---------- slice theme: accent colour follows the slice you're in ----------
+function accentFor(hex){let c=[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16));
+  const lum=a=>{const f=a.map(x=>{x/=255;return x<=.03928?x/12.92:Math.pow((x+.055)/1.055,2.4)});return .2126*f[0]+.7152*f[1]+.0722*f[2]};
+  let n=0;while(1.05/(lum(c)+.05)<4.5&&n++<30)c=c.map(x=>Math.round(x*.94));
+  return c}
+function applyTheme(){
+  const root=document.getElementById('app');let col=null;
+  const themed=['lab','addExp','adjust','dates','pencil','completed','grat','rename','finlab'];
+  let sid=null;
+  if(newp)sid=newp.s;
+  else if(themed.includes(v.n)&&v.p&&pr(v.p))sid=pr(v.p).sliceId;
+  else if(v.n==='start'&&v.s)sid=v.s;
+  const s=sid&&sl(sid);
+  if(s){const c=accentFor(s.color);root.style.setProperty('--moss','rgb('+c.join(',')+')');root.style.setProperty('--shadow-accent','0 10px 22px -10px rgba('+c.join(',')+',.28)')}
+  else{root.style.removeProperty('--moss');root.style.removeProperty('--shadow-accent')}
+  document.querySelectorAll('.overlay,.side,.flash,.toast').forEach(e=>{if(s){e.style.setProperty('--moss',root.style.getPropertyValue('--moss'))}});
+}
 function render(){
   const root=document.getElementById('app');
   root.innerHTML=VIEWS[v.n]()+(ui.side?sidebar():'')+(newp?`<div class="overlay" data-a="cancelNewBg"><div class="modal" style="padding:24px"><h2 class="h2" style="font-size:20px">What project are you working on?</h2><p style="margin:2px 0 4px">Just a name. It stays out of sight once you start.</p><input id="pname" class="field" placeholder="e.g. Make 10k" autocomplete="off" maxlength="80" style="margin-bottom:14px"><div class="two"><button class="btn out" data-a="cancelNew" style="flex:1">Cancel</button><button class="btn" data-a="startProject" style="flex:1">Start</button></div></div></div>`:'')+(modal?`<div class="overlay"><div class="modal"><h2 class="h2" style="font-size:19px">${esc(modal.title)}</h2><p>${esc(modal.body)}</p><div class="two"><button class="btn out" data-a="mno" style="flex:1">Cancel</button><button class="btn ${modal.red?'red':''}" data-a="myes" style="flex:1">${esc(modal.label)}</button></div></div></div>`:'');
   if(slide){root.animate([{transform:`translateX(${slide*34}px)`,opacity:.35},{transform:'none',opacity:1}],{duration:220,easing:'ease-out'});slide=0}
   if(flash){flash=false;if(S.flashName&&v.n==='lab'&&pr(v.p)){const d=document.createElement('div');d.className='flash';d.textContent=pr(v.p).name;document.body.appendChild(d);setTimeout(()=>d.remove(),1500)}}
   const f=root.querySelector('#pname,#ename,#gtext');if(f&&!/iPhone|iPad|Android/.test(navigator.userAgent))f.focus();
+  applyTheme();
   const imp=root.querySelector('#imp');if(imp)imp.onchange=importFile;
 }
 
@@ -360,7 +379,7 @@ const A={
   delAll(){ui.menu=false;const p=pr(v.p);ask('Delete all experiments?',`Every experiment under “${p.name}” — including any habit cards and everything logged in Completed for them — will be gone. This can't be undone.`,'Delete all',()=>{projExps(p.id).forEach(e=>delExp(e.id));save()})},
   finish(){const p=pr(v.p);p.status='finished';save();toast('Moved to Finished Projects');const act=activeProjects(p.sliceId);if(act.length){S.lastProj[p.sliceId]=act[0].id;save();go('lab',{p:act[0].id})}else go('pie')},
   side(){ui.side=true;render()},sideclose(){ui.side=false;ui.psel=null;render()},
-  reveal(){S.reveal=!S.reveal;save();render()},
+  reveal(){S.hideNames=!S.hideNames;save();render()},
   pdelone(d){const x=pr(d.id);ask('Delete this project?',`“${x.name}” and everything in it — every experiment, any habit cards, all of it logged in Completed — will be gone for good. This can't be undone.`,'Delete',()=>{const sid=x.sliceId,was=v.p===x.id;delProject(x.id);save();const act=activeProjects(sid);if(act.length){S.lastProj[sid]=act[0].id;v={n:'lab',p:act[0].id}}else{ui.side=false;v={n:'start',s:sid}}})},
   pgo(d){setProj(d.id);go('lab',{p:d.id})},
   prename(d){go('rename',{p:d.id})},
