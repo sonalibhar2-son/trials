@@ -102,6 +102,33 @@ input,textarea{font:inherit;color:var(--ink)}
 .lbl{font-size:9.5px;font-weight:500;fill:var(--ink);pointer-events:none}
 .empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px 0}
 .labcard{background:#fff;border-radius:var(--r-lg);padding:20px;box-shadow:var(--shadow-card)}
+
+.tabs{display:flex;gap:6px;background:var(--stone);border-radius:14px;padding:4px;margin:8px 0 16px}
+.tabs button{flex:1;padding:10px 4px;border-radius:11px;font-size:13px;font-weight:500;color:var(--ink-soft)}
+.tabs button.on{background:var(--washi);color:var(--ink);box-shadow:0 2px 8px -3px rgba(42,42,40,.25)}
+.dh{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);margin:16px 2px 8px;display:flex;align-items:center;gap:8px}
+.dh i{width:10px;height:10px;border-radius:50%;display:block}
+.qrow{display:flex;align-items:center;gap:12px;background:var(--stone);border-radius:14px;padding:12px 13px;margin-bottom:7px}
+.qrow.foc{background:#fff;border-left:3px solid var(--moss);box-shadow:0 8px 18px -10px rgba(42,42,40,.3)}
+.qrow.foc .qt{font-weight:700;font-size:16.5px}
+.qrow.done{opacity:.55}.qrow.done .qt{text-decoration:line-through}
+.qt{flex:1;font-family:'Zen Old Mincho',serif;font-size:15px;line-height:1.35}
+.qck{width:26px;height:26px;border-radius:50%;border:1.7px solid var(--ink-faint);flex-shrink:0;color:#fff;font-size:13px;display:flex;align-items:center;justify-content:center}
+.qck.on{background:var(--moss);border-color:var(--moss)}
+.qstar{font-size:18px;color:var(--ink-faint);padding:2px 4px;flex-shrink:0}.qstar.on{color:#B58A2F}
+.acc{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:var(--stone);border-radius:14px;padding:15px 14px;margin-bottom:7px;font-size:15px;font-weight:500}
+.acc.open{border-radius:14px 14px 0 0;margin-bottom:0}
+.acc i{width:11px;height:11px;border-radius:50%;display:block;flex-shrink:0}
+.acc .ar{margin-left:auto;color:var(--ink-faint);font-size:12px}
+.drop{background:rgba(241,236,221,.55);border-radius:0 0 14px 14px;padding:8px 8px 2px;margin-bottom:7px}
+.drop .qrow{background:var(--washi)}.drop .qrow.foc{background:#fff}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:10px;text-align:center;font-size:12px}
+.cal b{font-weight:400;color:var(--ink-faint);font-size:10px}
+.cd{padding:8px 0;border-radius:50%}.cd.s{background:var(--moss);color:#fff}.cd:disabled{color:#CFC9B9}
+.lbl2{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);margin:14px 2px 6px}
+.dr{display:flex;align-items:center;justify-content:space-between;background:var(--stone);border-radius:12px;padding:13px 12px;font-size:14px;width:100%}
+.jarwrap{display:flex;justify-content:center;margin:10px 0 4px}
+.jcard{background:var(--stone);border-radius:16px;padding:14px 16px;margin-top:12px}
 </style>
 </head>
 <body>
@@ -124,8 +151,8 @@ const dayLabel=iso=>{const t=today();if(iso===t)return'Today';const y=new Date()
 
 // ---------- ui state ----------
 let v={n:S.onboarded?'pie':'onboard'}, ui={}, modal=null;
-let slide=0,flash=false,newp=null;
-const go=(n,x={})=>{newp=null;v=Object.assign({n},x);ui={};render();window.scrollTo(0,0)};
+let slide=0,flash=false,newp=null,epop=null;
+const go=(n,x={})=>{newp=null;epop=null;v=Object.assign({n},x);ui={};render();window.scrollTo(0,0)};
 const sl=id=>S.slices.find(s=>s.id===id);
 const pr=id=>S.projects.find(p=>p.id===id);
 const activeProjects=sid=>S.projects.filter(p=>p.sliceId===sid&&p.status==='active');
@@ -151,6 +178,7 @@ const ENSO=(s=26)=>`<svg width="${s}" height="${s}" viewBox="0 0 40 40"><path d=
 const FLASK=`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2C4A34" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M10 3v6l-5.5 9.5a1.5 1.5 0 0 0 1.3 2.2h12.4a1.5 1.5 0 0 0 1.3-2.2L14 9V3"/></svg>`;
 const BARS=`<svg width="16" height="16" viewBox="0 0 24 24" stroke="#2A2A28" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg>`;
 const TRASH=`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6h16Z"/></svg>`;
+const JARICO=`<svg width="17" height="19" viewBox="0 0 16 18"><path d="M3 3 H13 M4 3 V14 Q4 16 6 16 H10 Q12 16 12 14 V3" fill="none" stroke="#2A2A28" stroke-width="1.4" stroke-linecap="round"/><circle cx="7" cy="13" r="1.5" fill="#2C4A34"/><circle cx="10" cy="13" r="1.5" fill="#2C4A34"/></svg>`;
 const back=(a,t)=>`<button class="back" data-a="${a}">← ${t}</button>`;
 
 function vOnboard(){return `<div class="empty">${ENSO(54)}<h1 class="h2" style="font-size:26px;margin-top:22px">This app is about the process.</h1>
@@ -169,7 +197,7 @@ function vPie(){
     const x=140+114*Math.cos(rad),y=140+114*Math.sin(rad)+3;
     labels+=`<text class="lbl" data-i="${i}" x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="middle">${esc(s.name.trim().split(/\s+/)[0].toLowerCase())}</text>`;
   });
-  return `<div class="row" style="margin-bottom:14px"><span style="display:flex;align-items:center;gap:8px">${ENSO(22)}<b class="serif" style="color:var(--moss)">Trials</b></span><button class="link faint" data-a="settings">Settings</button></div>
+  return `<div class="row" style="margin-bottom:14px"><span style="display:flex;align-items:center;gap:8px">${ENSO(22)}<b class="serif" style="color:var(--moss)">Trials</b></span><span style="display:flex;gap:18px"><button class="link" data-a="tab" data-k="today">Today</button><button class="link faint" data-a="settings">Settings</button></span></div>
   <h1 class="h1">${g}</h1><p class="sub">${words[n]||n} ${n===1?'area':'areas'}. Choose one to tend.</p>
   <div style="display:flex;justify-content:center;margin:4px 0 14px"><svg viewBox="0 0 280 280" style="width:100%;max-width:300px">${circles}
   <circle cx="140" cy="140" r="56" fill="#FBF8F1" pointer-events="none" style="filter:drop-shadow(0 4px 10px rgba(42,42,40,.14))"/>
@@ -225,9 +253,9 @@ return `<div class="row">${back(v.from||'lab','Back')}<button class="icon-btn" d
 ${e.reflect?`<div class="card"><div class="meta" style="margin:0 0 4px">Something I've noticed about myself since starting this…</div><textarea id="overall" class="field small" rows="3" style="margin-top:4px" placeholder="I'm someone who…">${esc(e.overall||'')}</textarea><button class="link" data-a="saveOverall" style="margin-top:8px">Save</button></div>`:''}
 ${ens.map(x=>`<div class="list-row"><div class="grow"><div class="nm" style="font-size:14.5px">${dayLabel(x.date)}</div>${x.words&&ui.edit!==x.id?`<div class="words">${esc(x.words)}</div>`:''}
 ${ui.edit===x.id?`<input id="w-${x.id}" class="field small" placeholder="I'm someone who…" value="${esc(x.words||'')}" maxlength="200"><button class="link" data-a="saveWords" data-id="${x.id}" style="margin-top:6px">Save</button>`:''}</div>
-${e.pencilDates?`<button class="icon-btn" data-a="editWords" data-id="${x.id}" style="border:none">✎</button>`:''}<button class="icon-btn" style="border:none" data-a="delEntry" data-id="${x.id}" aria-label="Delete">${TRASH}</button></div>`).join('')}
+<button class="icon-btn" data-a="editEntry" data-id="${x.id}" style="border:none" aria-label="Edit words or day">✎</button><button class="icon-btn" style="border:none" data-a="delEntry" data-id="${x.id}" aria-label="Delete">${TRASH}</button></div>`).join('')}
 ${e.status==='doneForNow'?'<div style="margin-top:20px"><button class="btn out" data-a="bringBack">Bring back to the lab</button></div>':''}
-<p class="meta center" style="margin-top:22px;line-height:1.6">${e.pencilDates?'Tap the pencil next to a date to add your own words.':'Just dates by default. The ⚙ turns on pencils, if wanted.'}</p>`}
+<p class="meta center" style="margin-top:22px;line-height:1.6">Tap ✎ to add your own words or change the day.</p>`}
 
 function vPencil(){const e=S.exps.find(x=>x.id===v.e);const t=ui.t||{reflect:!!e.reflect,pd:!!e.pencilDates};
 const row=(k,a,b)=>`<button class="set" data-a="tp" data-k="${k}"><span><b>${a}</b><small>${b}</small></span><span class="toggle ${t[k]?'on':''}"><i></i></span></button>`;
@@ -241,11 +269,11 @@ function vCompleted(){
   const groups={};hist.forEach(h=>(groups[h.date]=groups[h.date]||[]).push(h));
   const ro=v.ro;
   const wordsEdit=(key,val,saveA,id)=>ui.edit===key?`<input id="w-${key}" class="field small" placeholder="I'm someone who…" value="${esc(val||'')}" maxlength="200"><button class="link" data-a="${saveA}" data-id="${id}" style="margin-top:6px">Save</button>`:(val?`<div class="words">${esc(val)}</div>`:'');
-  return `${back(ro?'finished':'lab','Lab')}<h1 class="h2" style="margin-top:6px">Completed</h1><div class="crumb" style="margin-top:0">Experiments</div>
+  return `<div class="row">${back(ro?'finished':'lab','Lab')}${ro?'':`<button class="lab-icon" data-a="jar" aria-label="Your jar">${JARICO}</button>`}</div><h1 class="h2" style="margin-top:6px">Completed</h1><div class="crumb" style="margin-top:0">Experiments</div>
   ${!hab.length&&!hist.length?'<p class="sub center" style="padding:40px 0">Nothing here yet. When you tap “I did it”, it lands here.</p>':''}
   ${hab.length?`<div class="sec" style="margin-top:0">Habits</div>${hab.map(e=>`<div class="list-row"><span class="chk">✓</span><button class="grow" data-a="dates" data-id="${e.id}" data-from="completed" style="text-align:left"><div class="nm">${esc(e.name)}</div><div class="meta">${countOf(e.id)} ${countOf(e.id)===1?'time':'times'}${e.status==='doneForNow'?' · Done':''}</div>${ui.edit!==e.id&&e.overall?`<div class="words">${esc(e.overall)}</div>`:''}</button>${ro?'':`<button class="icon-btn" style="border:none" data-a="editWords" data-id="${e.id}" data-ex="1">✎</button><button class="icon-btn" style="border:none" data-a="delHabit" data-id="${e.id}">${TRASH}</button>`}</div>${ui.edit===e.id?`<div style="padding:0 0 12px 30px">${wordsEdit(e.id,e.overall,'saveOverallRow',e.id)}</div>`:''}`).join('')}`:''}
-  ${hist.length?`<div class="sec">One-time</div>${Object.keys(groups).sort().reverse().map(d=>`<div class="sub2">${dayLabel(d)}</div>${groups[d].map(h=>{const e=ex.find(x=>x.id===h.expId);return `<div class="list-row" style="align-items:flex-start"><span class="chk" style="margin-top:2px">✓</span><div class="grow"><div class="nm">${esc(e.name)}</div><div class="meta">${dayLabel(h.date)}</div>${wordsEdit(h.id,h.words,'saveWords',h.id)}</div>${ro?'':`<button class="icon-btn" style="border:none" data-a="editWords" data-id="${h.id}">✎</button><button class="icon-btn" style="border:none" data-a="delEntry" data-id="${h.id}">${TRASH}</button>`}</div>`}).join('')}`).join('')}`:''}
-  ${hab.length||hist.length?'<p class="meta center" style="margin-top:20px">Tap a habit to see its dates, or the pencil for your own words.</p>':''}`}
+  ${hist.length?`<div class="sec">One-time</div>${Object.keys(groups).sort().reverse().map(d=>`<div class="sub2">${dayLabel(d)}</div>${groups[d].map(h=>{const e=ex.find(x=>x.id===h.expId);return `<div class="list-row" style="align-items:flex-start"><span class="chk" style="margin-top:2px">✓</span><div class="grow"><div class="nm">${esc(e.name)}</div><div class="meta">${dayLabel(h.date)}</div>${wordsEdit(h.id,h.words,'saveWords',h.id)}</div>${ro?'':`<button class="icon-btn" style="border:none" data-a="editEntry" data-id="${h.id}" aria-label="Edit words or day">✎</button><button class="icon-btn" style="border:none" data-a="delEntry" data-id="${h.id}">${TRASH}</button>`}</div>`}).join('')}`).join('')}`:''}
+  ${hab.length||hist.length?'<p class="meta center" style="margin-top:20px">Tap a habit to see its dates. Tap ✎ on a log to add your words or change the day.</p>':''}`}
 const lastTouch=id=>Math.max(0,...S.entries.filter(e=>e.expId===id).map(e=>e.ts||0));
 
 function vGrat(){return `${back('lab','Lab')}<h1 class="h2" style="margin-top:6px">Gratitude</h1><div style="height:8px"></div>
@@ -292,6 +320,7 @@ function sidebar(){
   const show=!S.hideNames||!!sel;
   const fin=S.showFinished?finishedProjects(p.sliceId):[];
   return `<div class="side"><div class="pane"><div class="row" style="margin-bottom:6px"><span class="meta" style="margin:0;font-size:13px">${sel?'':esc(sl(p.sliceId).name)}</span><button class="icon-btn" style="border:none" data-a="sideclose" aria-label="Close">✕</button></div>
+  ${sel?'':`<div style="margin-bottom:14px">${[['today','☀  Today']].map(t=>`<button class="sitem" data-a="tab" data-k="${t[0]}">${t[1]}</button>`).join('')}</div>`}
   <div class="row" style="margin-bottom:16px"><b class="serif" style="font-size:24px;font-weight:500">${sel?'Select projects':'Projects'}</b>${sel?`<button class="link" data-a="pall">Select all</button>`:(show?`<button class="link" data-a="psel">Select</button>`:'')}</div>
   ${S.hideNames&&!sel&&act.length?`<p class="meta" style="margin:0 4px 10px;line-height:1.5">Tap a circle to pick a colour, so you can tell your projects apart.</p>`:''}
   ${act.map(x=>`<div class="row" style="gap:4px;margin-bottom:6px">${S.hideNames&&!sel?`<button data-a="cpick" data-id="${x.id}" aria-label="Pick a colour" style="padding:8px"><span style="display:block;width:20px;height:20px;border-radius:50%;background:${x.color||'#fff'};border:1.6px solid ${x.color||'#CFC9B8'}"></span></button>`:''}<button class="sitem ${x.id===p.id&&!sel?'act':''}" style="margin:0;background:${x.id===p.id&&!sel?'var(--washi)':'rgba(251,248,241,.55)'}" data-a="${sel?'ptog':'pgo'}" data-id="${x.id}">${show?esc(x.name):'&nbsp;'}</button>
@@ -302,7 +331,54 @@ function sidebar(){
 
 function vRename(){const p=pr(v.p);return `${back('lab','Cancel')}<h1 class="h2" style="margin-top:6px">Rename this project</h1><input id="pname" class="field" value="${esc(p.name)}" maxlength="80"><button class="btn" data-a="saveRename">Save</button>`}
 
-const VIEWS={onboard:vOnboard,pie:vPie,start:vStart,lab:vLab,addExp:vAdd,adjust:vAdjust,dates:vDates,pencil:vPencil,completed:vCompleted,grat:vGrat,settings:vSettings,finished:vFinished,finlab:vFinLab,custom:vCustom,why:vWhy,rename:vRename};
+
+// ---------- Today / Habits / Try once ----------
+const isoOf=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const liveExps=()=>S.exps.filter(e=>{const p=pr(e.projectId);return p&&p.status==='active'});
+const doneToday=e=>S.entries.some(n=>n.expId===e.id&&n.date===today());
+const isFocus=e=>e.focusDate===today();
+const showable=e=>e.status==='pending'||(e.status==='done'&&doneToday(e));
+const catsFor=list=>S.slices.map(s=>({s,items:list.filter(e=>pr(e.projectId).sliceId===s.id)})).filter(c=>c.items.length);
+const tabs=c=>`<div class="row">${back('pie','Pie')}</div><h1 class="h2" style="margin-top:6px">Today</h1>`;
+const qrow=e=>{const d=doneToday(e),f=isFocus(e);return `<div class="qrow ${d?'done':''} ${f?'foc':''}"><button class="qck ${d?'on':''}" data-a="qlog" data-id="${e.id}" ${d?'disabled':''} aria-label="Log it">${d?'✓':''}</button><span class="qt">${esc(e.name)}</span>${d?'':`<button class="qstar ${f?'on':''}" data-a="star" data-id="${e.id}" aria-label="Focus today">${f?'★':'☆'}</button>`}</div>`};
+function vToday(){
+  const list=liveExps().filter(showable);
+  const foc=list.filter(isFocus);
+  const cats=catsFor(list);const open=ui.open||{};
+  return `${tabs('today')}
+  ${!list.length?`<p class="sub center" style="padding:36px 0">Nothing here yet. Add an experiment in any project and it shows up here.</p>`:`
+  ${foc.length?`<div class="dh"><i style="background:#B58A2F"></i>Focus</div>${foc.map(qrow).join('')}`:''}
+  <div class="dh">Categories</div>
+  ${cats.map(c=>`<button class="acc ${open[c.s.id]?'open':''}" data-a="acc" data-id="${c.s.id}"><i style="background:${c.s.color}"></i>${esc(c.s.name)}<span class="ar">${open[c.s.id]?'▾':'▸'}</span></button>${open[c.s.id]?`<div class="drop">${c.items.map(qrow).join('')}</div>`:''}`).join('')}
+  <p class="meta center" style="margin-top:16px;line-height:1.6">${foc.length?'Tap ✓ to log it for today.':'Tap ☆ on up to three things to focus on today.'}</p>`}`}
+// ---------- jar ----------
+function vJar(){
+  const p=pr(v.p);const ex=projExps(p.id);const col=sl(p.sliceId).color;
+  const ens=S.entries.filter(en=>ex.some(e=>e.id===en.expId)).sort((a,b)=>a.date.localeCompare(b.date)||(a.ts||0)-(b.ts||0));
+  const n=ens.length;const R=n<=20?11:n<=60?8.5:6;const cols=Math.max(1,Math.floor(96/(2*R)));const rows=Math.ceil(n/cols);
+  const x0=52+(96-cols*2*R)/2+R;const top=Math.min(0,206-rows*R*1.85-R-8);
+  let m='';ens.forEach((en,i)=>{const r=Math.floor(i/cols),c=i%cols;const j=((i*37)%7-3)*.35;const x=x0+c*2*R+j,y=206-R-r*R*1.85;const sel=ui.sel===en.id;
+    m+=`<circle data-a="marble" data-id="${en.id}" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(R-.8+(sel?1.4:0)).toFixed(1)}" fill="${col}" opacity="${en.words?1:.8}" stroke="${sel||en.words?'#2A2A28':'none'}" stroke-width="${sel?3:1.5}" style="cursor:pointer"/><circle cx="${(x-R*.3).toFixed(1)}" cy="${(y-R*.32).toFixed(1)}" r="${(R*.26).toFixed(1)}" fill="#fff" opacity=".32" pointer-events="none"/>`});
+  const selE=ui.sel&&S.entries.find(x=>x.id===ui.sel);const selX=selE&&S.exps.find(x=>x.id===selE.expId);
+  return `<div class="row">${back('completed','Completed')}</div><h1 class="h2" style="margin-top:6px">Your jar</h1>
+  <div class="jarwrap"><svg viewBox="0 ${top} 200 ${230-top}" style="width:100%;max-width:230px;overflow:visible">${m}<path d="M52 52 Q52 40 60 40 H140 Q148 40 148 52 V190 Q148 214 124 214 H76 Q52 214 52 190Z" fill="rgba(255,255,255,.18)" stroke="#9F9A8E" stroke-width="2.2" pointer-events="none"/><path d="M58 30 H142" stroke="#9F9A8E" stroke-width="3" stroke-linecap="round" pointer-events="none"/></svg></div>
+  <div class="center serif" style="font-size:16px">${n} ${n===1?'vote':'votes'} for yourself</div>
+  <p class="meta center" style="margin-top:6px">${n?(selE?'':'Tap a marble to see it. Ringed ones have your words.'):'Your first marble lands here when you log something.'}</p>
+  ${selE?`<div class="jcard"><div class="row" style="align-items:flex-start"><div><div class="meta" style="margin:0">${dayLabel(selE.date)}</div><div class="nm" style="margin-top:3px">${esc(selX?selX.name:'')}</div></div><button class="icon-btn" style="border:none" data-a="editEntry" data-id="${selE.id}" aria-label="Edit">✎</button></div>${selE.words?`<div class="words" style="font-size:16px;margin-top:8px">${esc(selE.words)}</div>`:`<div class="meta" style="margin-top:8px">No words added. It still counts.</div>`}</div>`:''}`}
+
+// ---------- entry pop-up (words + day) ----------
+function epopHTML(){
+  if(!epop)return '';const en=S.entries.find(x=>x.id===epop.id);if(!en)return '';const e=S.exps.find(x=>x.id===en.expId);const t=today();
+  let cal='';
+  if(epop.cal){const [a,b,c]=t.split('-').map(Number);const td=new Date(a,b-1,c);const dow=(td.getDay()+6)%7;const st=new Date(td);st.setDate(td.getDate()-dow-21);
+    let cells='';for(let i=0;i<28;i++){const d=new Date(st);d.setDate(st.getDate()+i);const iso=isoOf(d);cells+=`<button class="cd ${iso===epop.date?'s':''}" ${iso>t?'disabled':''} data-a="epDay" data-d="${iso}">${d.getDate()}</button>`}
+    cal=`<div class="cal"><b>M</b><b>T</b><b>W</b><b>T</b><b>F</b><b>S</b><b>S</b>${cells}</div>`}
+  return `<div class="overlay" style="align-items:flex-end;padding:0"><div class="modal" style="border-radius:22px 22px 0 0;max-width:440px;padding:20px 20px 22px;max-height:92vh;overflow:auto"><div class="nm" style="font-size:17px">${esc(e?e.name:'')}</div>
+  <div class="lbl2">Your words</div><input id="ew" class="field" style="margin:0" placeholder="I’m someone who…" value="${esc(epop.words)}" maxlength="200">
+  <div class="lbl2">Day</div><button class="dr" data-a="epCal"><span>${dayLabel(epop.date)}</span><span class="link" style="font-size:12px">Change ${epop.cal?'▾':'›'}</span></button>${cal}
+  <div class="two" style="margin-top:18px"><button class="btn out" data-a="epClose" style="flex:1">Cancel</button><button class="btn" data-a="epSave" style="flex:1">Save</button></div></div></div>`}
+
+const VIEWS={today:vToday,jar:vJar,onboard:vOnboard,pie:vPie,start:vStart,lab:vLab,addExp:vAdd,adjust:vAdjust,dates:vDates,pencil:vPencil,completed:vCompleted,grat:vGrat,settings:vSettings,finished:vFinished,finlab:vFinLab,custom:vCustom,why:vWhy,rename:vRename};
 
 // ---------- slice theme: accent colour follows the slice you're in ----------
 function accentFor(hex){let c=[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16));
@@ -311,7 +387,7 @@ function accentFor(hex){let c=[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16));
   return c}
 function applyTheme(){
   const root=document.getElementById('app');let col=null;
-  const themed=['lab','addExp','adjust','dates','pencil','completed','grat','rename','finlab'];
+  const themed=['jar','lab','addExp','adjust','dates','pencil','completed','grat','rename','finlab'];
   let sid=null;
   if(newp)sid=newp.s;
   else if(themed.includes(v.n)&&v.p&&pr(v.p))sid=pr(v.p).sliceId;
@@ -323,9 +399,9 @@ function applyTheme(){
 }
 function render(){
   const root=document.getElementById('app');
-  root.innerHTML=VIEWS[v.n]()+(ui.side?sidebar():'')+(newp?`<div class="overlay" data-a="cancelNewBg"><div class="modal" style="padding:24px"><h2 class="h2" style="font-size:20px">What project are you working on?</h2><p style="margin:2px 0 4px">Just a name. It stays out of sight once you start.</p><input id="pname" class="field" placeholder="e.g. Make 10k" autocomplete="off" maxlength="80" style="margin-bottom:14px"><div class="two"><button class="btn out" data-a="cancelNew" style="flex:1">Cancel</button><button class="btn" data-a="startProject" style="flex:1">Start</button></div></div></div>`:'')+(modal?`<div class="overlay"><div class="modal"><h2 class="h2" style="font-size:19px">${esc(modal.title)}</h2><p>${esc(modal.body)}</p><div class="two"><button class="btn out" data-a="mno" style="flex:1">Cancel</button><button class="btn ${modal.red?'red':''}" data-a="myes" style="flex:1">${esc(modal.label)}</button></div></div></div>`:'');
+  root.innerHTML=VIEWS[v.n]()+(ui.side?sidebar():'')+(newp?`<div class="overlay" data-a="cancelNewBg"><div class="modal" style="padding:24px"><h2 class="h2" style="font-size:20px">What project are you working on?</h2><p style="margin:2px 0 4px">Just a name. It stays out of sight once you start.</p><input id="pname" class="field" placeholder="e.g. Make 10k" autocomplete="off" maxlength="80" style="margin-bottom:14px"><div class="two"><button class="btn out" data-a="cancelNew" style="flex:1">Cancel</button><button class="btn" data-a="startProject" style="flex:1">Start</button></div></div></div>`:'')+epopHTML()+(modal?`<div class="overlay"><div class="modal"><h2 class="h2" style="font-size:19px">${esc(modal.title)}</h2><p>${esc(modal.body)}</p><div class="two"><button class="btn out" data-a="mno" style="flex:1">Cancel</button><button class="btn ${modal.red?'red':''}" data-a="myes" style="flex:1">${esc(modal.label)}</button></div></div></div>`:'');
   if(slide){root.animate([{transform:`translateX(${slide*34}px)`,opacity:.35},{transform:'none',opacity:1}],{duration:220,easing:'ease-out'});slide=0}
-  if(flash){flash=false;if(S.flashName&&v.n==='lab'&&pr(v.p)){const d=document.createElement('div');d.className='flash';d.textContent=pr(v.p).name;document.body.appendChild(d);setTimeout(()=>d.remove(),1500)}}
+  if(flash){flash=false;if(S.flashName&&v.n==='lab'&&pr(v.p)){const d=document.createElement('div');d.className='flash';d.textContent=pr(v.p).name;document.body.appendChild(d);setTimeout(()=>d.remove(),2200)}}
   const f=root.querySelector('#pname,#ename,#gtext');if(f&&!/iPhone|iPad|Android/.test(navigator.userAgent))f.focus();
   applyTheme();
   const imp=root.querySelector('#imp');if(imp)imp.onchange=importFile;
@@ -340,7 +416,7 @@ const A={
   onboard(){go('onboard')},
   settings(){go('settings')},
   slice(d){openSlice(d.id)},
-  startProject(){const n=val('pname');if(!n)return;const sid=newp?newp.s:v.s;const p={id:uid(),sliceId:sid,name:n,status:'active'};S.projects.push(p);S.lastProj[sid]=p.id;save();go('lab',{p:p.id})},
+  startProject(){const n=val('pname');if(!n)return;const sid=newp?newp.s:v.s;const p={id:uid(),sliceId:sid,name:n,status:'active'};S.projects.push(p);S.lastProj[sid]=p.id;save();flash=true;go('lab',{p:p.id})},
   cancelNewBg(d){ },
   cancelNew(){newp=null;render()},
   addProject(){ui.side=false;ui.menu=false;newp={s:pr(v.p).sliceId};render()},
@@ -413,6 +489,18 @@ const A={
   restore(){const b=S.backup;if(!b)return;S.slices=b.slices;S.projects=b.projects;S.exps=b.exps;S.entries=b.entries;S.lastProj=b.lastProj||{};S.backup=null;save();toast('Previous pie restored');render()},
   delBackup(){ask('Delete for good?','Your previous pie and everything in it will be gone permanently, with no 30-day window.','Delete now',()=>{S.backup=null;save()})},
   export(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(S,null,1)],{type:'application/json'}));a.download='trials-backup-'+today()+'.json';a.click()},
+
+  tab(d){go(d.k)},
+  acc(d){ui.open=ui.open||{};ui.open[d.id]=!ui.open[d.id];render()},
+  qlog(d){const e=S.exps.find(x=>x.id===d.id);if(!e||doneToday(e))return;S.entries.push({id:uid(),expId:e.id,date:today(),ts:Date.now(),words:''});if(!e.repeats)e.status='done';save();render()},
+  star(d){const e=S.exps.find(x=>x.id===d.id);if(isFocus(e)){e.focusDate=null}else{if(liveExps().filter(isFocus).length>=3){toast('Three is plenty for one day');return}e.focusDate=today()}save();render()},
+  jar(){go('jar',{p:v.p})},
+  marble(d){ui.sel=ui.sel===d.id?null:d.id;render()},
+  editEntry(d){const en=S.entries.find(x=>x.id===d.id);if(!en)return;epop={id:d.id,words:en.words||'',date:en.date,cal:false};render()},
+  epCal(){const w=document.getElementById('ew');if(w)epop.words=w.value;epop.cal=!epop.cal;render()},
+  epDay(d){const w=document.getElementById('ew');if(w)epop.words=w.value;epop.date=d.d;epop.cal=false;render()},
+  epClose(){epop=null;render()},
+  epSave(){const en=S.entries.find(x=>x.id===epop.id);if(en){en.words=val('ew');en.date=epop.date}save();epop=null;render()},
   mno(){modal=null;render()},
   myes(){const m=modal;modal=null;m.fn();ui.menu=false;render()},
 };
@@ -420,6 +508,7 @@ function importFile(e){const f=e.target.files[0];if(!f)return;const r=new FileRe
 
 document.addEventListener('click',ev=>{
   if(newp&&ev.target.classList&&ev.target.classList.contains('overlay')){newp=null;render();return}
+  if(epop&&ev.target.classList&&ev.target.classList.contains('overlay')){epop=null;render();return}
   const el=ev.target.closest('[data-a]');
   if(!el){if(ui.menu){ui.menu=false;render()}return}
   if(el.tagName==='INPUT')return;
