@@ -433,11 +433,13 @@ function applyTheme(){
 }
 function render(){
   const root=document.getElementById('app');
+  const _sp=root.querySelector('.side .pane');const _st=_sp?_sp.scrollTop:0;
   root.innerHTML=VIEWS[v.n]()+(ui.side?sidebar():'')+(newp?`<div class="overlay" data-a="cancelNewBg"><div class="modal" style="padding:24px"><h2 class="h2" style="font-size:20px">What project are you working on?</h2><p style="margin:2px 0 4px">Just a name. It stays out of sight once you start.</p><input id="pname" class="field" placeholder="e.g. Make 10k" autocomplete="off" maxlength="80" style="margin-bottom:14px"><div class="two"><button class="btn out" data-a="cancelNew" style="flex:1">Cancel</button><button class="btn" data-a="startProject" style="flex:1">Start</button></div></div></div>`:'')+(modal?`<div class="overlay"><div class="modal"><h2 class="h2" style="font-size:19px">${esc(modal.title)}</h2><p>${esc(modal.body)}</p><div class="two"><button class="btn out" data-a="mno" style="flex:1">Cancel</button><button class="btn ${modal.red?'red':''}" data-a="myes" style="flex:1">${esc(modal.label)}</button></div></div></div>`:'');
   if(slide){root.animate([{transform:`translateX(${slide*34}px)`,opacity:.35},{transform:'none',opacity:1}],{duration:220,easing:'ease-out'});slide=0}
   if(flash){flash=false;if(S.flashName&&v.n==='lab'&&pr(v.p)){const d=document.createElement('div');d.className='flash';d.textContent=pr(v.p).name;document.body.appendChild(d);setTimeout(()=>d.remove(),2200)}}
   const f=root.querySelector('#pname,#ename,#gtext');if(f&&!/iPhone|iPad|Android/.test(navigator.userAgent))f.focus();
   applyTheme();
+  if(_st){const sp2=root.querySelector('.side .pane');if(sp2)sp2.scrollTop=_st}
   const imp=root.querySelector('#imp');if(imp)imp.onchange=importFile;
 }
 
