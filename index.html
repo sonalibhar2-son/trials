@@ -364,7 +364,7 @@ function sidebar(){
     return head+(open?`<div class="pbody">${hid&&!edit?`<div style="display:flex;gap:9px;align-items:center;flex-wrap:wrap;padding:2px 4px 10px">${PAL.map(c=>`<button data-a="setcolor" data-id="${x.id}" data-c="${c}" aria-label="Colour" style="width:22px;height:22px;border-radius:50%;background:${c};${x.color===c?'outline:2px solid var(--ink);outline-offset:2px':''}"></button>`).join('')}</div>`:''}${exs.length?exs.map(e=>exRow(e,edit)).join(''):'<div class="meta" style="margin:0 6px 8px">Nothing to do here yet.</div>'}${pager}<div style="display:flex;gap:26px;justify-content:center;padding:6px 6px 12px"><button class="link" style="font-size:12.5px" data-a="pgo" data-id="${x.id}">Open lab</button><button class="link" style="font-size:12.5px" data-a="pedit" data-id="${x.id}">${edit?'Done':'Edit'}</button></div></div>`:'')};
   const foc=liveExps().filter(e=>isFocus(e)&&showable(e));
   return `<div class="side"><div class="pane"><div class="row" style="margin-bottom:12px"><b class="serif" style="font-size:24px;font-weight:500">Trials</b><button class="icon-btn" style="border:none" data-a="sideclose" aria-label="Close">✕</button></div>
-  ${foc.length?`<div class="fh"><span style="color:#B58A2F">★</span>Focus today</div>${foc.map(e=>exRow(e,false)).join('')}<div style="height:8px"></div><div class="fh">Areas</div>`:''}
+  ${foc.length?`<div class="fh"><span style="color:#B58A2F">★</span>Focus today<button class="link" style="margin-left:auto;font-size:12px" data-a="fedit">${ui.fedit?'Done':'Edit'}</button></div>${foc.map(e=>exRow(e,!!ui.fedit)).join('')}<div style="height:8px"></div><div class="fh">Areas</div>`:''}
   ${S.slices.map(a=>`<button class="acc ${ui.so&&ui.so[a.id]?'open':''}" data-a="sacc" data-id="${a.id}"><i style="background:${a.color}"></i>${esc(a.name)}<span class="ar">${ui.so&&ui.so[a.id]?'▾':'▸'}</span></button>${ui.so&&ui.so[a.id]?`<div class="drop">${activeProjects(a.id).map(proj).join('')}<button class="link" data-a="addProject" data-id="${a.id}" style="margin:6px 8px 10px">+ Add project</button></div>`:''}`).join('')}
   <div class="row" style="margin-top:14px;justify-content:flex-end"><button class="link" data-a="reveal">${hide?'Show':'Hide'} all project names</button></div>
   </div><div class="shade" data-a="sideclose"></div></div>`}
@@ -470,6 +470,7 @@ const A={
   unfocus(d){const e=S.exps.find(x=>x.id===d.id);e.focusDate=null;save();render()},
   ppg(d){ui.pg=ui.pg||{};ui.pg[d.id]=Math.max(0,(ui.pg[d.id]||0)+Number(d.n));render()},
   pshowall(d){ui.all=ui.all||{};ui.all[d.id]=!ui.all[d.id];render()},
+  fedit(){ui.fedit=!ui.fedit;ui.ren=null;render()},
   pedit(d){ui.ped=ui.ped||{};ui.ped[d.id]=!ui.ped[d.id];ui.ren=null;render()},
   renStart(d){const cur=d.k==='p'?pr(d.id).name:S.exps.find(x=>x.id===d.id).name;ui.ren={k:d.k,id:d.id,val:cur};render()},
   renSave(){const r=ui.ren;const n=val('rn-'+r.id);if(n){if(r.k==='p')pr(r.id).name=n;else S.exps.find(x=>x.id===r.id).name=n;save()}ui.ren=null;render()},
