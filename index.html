@@ -390,7 +390,7 @@ const liveExps=()=>S.exps.filter(e=>{const p=pr(e.projectId);return p&&p.status=
 const isFocus=e=>e.focusDate===today();
 const focusCount=()=>liveExps().filter(isFocus).length;
 const doneToday=e=>S.entries.some(n=>n.expId===e.id&&n.date===today());
-const showable=e=>e.status==='pending'||(e.status==='done'&&doneToday(e));
+const showable=e=>e.status==='pending'||!!(ui.fading&&ui.fading[e.id]);
 const calHTML=(sel,act)=>{const t=today();const [a,b,c]=t.split('-').map(Number);const td=new Date(a,b-1,c);const dow=(td.getDay()+6)%7;const st=new Date(td);st.setDate(td.getDate()-dow-21);
   let cells='';for(let i=0;i<28;i++){const d=new Date(st);d.setDate(st.getDate()+i);const iso=isoOf(d);cells+=`<button class="cd ${iso===sel?'s':''}" ${iso>t?'disabled':''} data-a="${act}" data-d="${iso}">${d.getDate()}</button>`}
   return `<div class="cal"><b>M</b><b>T</b><b>W</b><b>T</b><b>F</b><b>S</b><b>S</b>${cells}</div>`};
@@ -487,7 +487,7 @@ const A={
   editDate(d){const en=S.entries.find(x=>x.id===d.id);ui.ed=ui.ed===d.id?null:d.id;ui.dd=en.date;ui.edit=null;render()},
   calpick(d){ui.dd=d.d;render()},
   saveDate(d){const en=S.entries.find(x=>x.id===d.id);if(ui.dd)en.date=ui.dd;ui.ed=null;save();render()},
-  sblog(d){const e=S.exps.find(x=>x.id===d.id);if(!e)return;if(!e.repeats&&doneToday(e))return;S.entries.push({id:uid(),expId:e.id,date:today(),ts:Date.now(),words:''});if(!e.repeats)e.status='done';save();toast('Logged');render()},
+  sblog(d){const e=S.exps.find(x=>x.id===d.id);if(!e)return;if(!e.repeats&&doneToday(e))return;S.entries.push({id:uid(),expId:e.id,date:today(),ts:Date.now(),words:''});if(!e.repeats){e.status='done';ui.fading=ui.fading||{};ui.fading[e.id]=true;setTimeout(()=>{if(ui.fading){delete ui.fading[e.id];render()}},700)}save();toast('Logged');render()},
   sacc(d){ui.so=ui.so||{};ui.so[d.id]=!ui.so[d.id];render()},
   saveWords(d){const en=S.entries.find(x=>x.id===d.id);en.words=val('w-'+d.id);save();ui.edit=null;render()},
   saveOverallRow(d){const e=S.exps.find(x=>x.id===d.id);e.overall=val('w-'+d.id);save();ui.edit=null;render()},
