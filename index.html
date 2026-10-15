@@ -207,7 +207,7 @@ function vPie(){
     const x=140+114*Math.cos(rad),y=140+114*Math.sin(rad)+3;
     labels+=`<text class="lbl" data-i="${i}" x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="middle">${esc(s.name.trim().split(/\s+/)[0].toLowerCase())}</text>`;
   });
-  return `<div class="row" style="margin-bottom:14px"><span style="display:flex;align-items:center;gap:8px">${ENSO(22)}<b class="serif" style="color:var(--moss)">Trials</b></span><button class="link faint" data-a="settings">Settings</button></div>
+  return `<div class="row" style="margin-bottom:14px"><span style="display:flex;align-items:center;gap:10px"><button class="lab-icon" data-a="side" aria-label="Menu">${BARS}</button>${ENSO(22)}<b class="serif" style="color:var(--moss)">Trials</b></span><button class="link faint" data-a="settings">Settings</button></div>
   <h1 class="h1">${g}</h1><p class="sub">${words[n]||n} ${n===1?'area':'areas'}. Choose one to tend.</p>
   <div style="display:flex;justify-content:center;margin:4px 0 14px"><svg viewBox="0 0 280 280" style="width:100%;max-width:300px">${circles}
   <circle cx="140" cy="140" r="56" fill="#FBF8F1" pointer-events="none" style="filter:drop-shadow(0 4px 10px rgba(42,42,40,.14))"/>
@@ -326,17 +326,17 @@ function vWhy(){return `<div class="why">${back(v.from||'pie','Back')}<h1 class=
 <h3>Why experiments work two ways.</h3><p>Most things you add are one-time — do it once, tap “I did it,” and it goes straight into Completed. Some things you'll want to keep showing up for. Turn on Repeats in Adjust and the card stays put, with a “Log it” button that adds to a quiet count. “Mark done” sends it away — nothing is deleted, and you can bring it back any time.</p></div>`}
 
 function sidebar(){
-  if(ui.psel)return sidebarOld();
-  const p=pr(v.p);const hide=S.hideNames;
-  const areas=S.slices.filter(x=>activeProjects(x.id).length);
-  const isOpen=id=>ui.so?!!ui.so[id]:id===p.sliceId;
-  const fin=S.showFinished?finishedProjects(p.sliceId):[];
+  if(v.n!=='pie')return sidebarOld();
+  const p=pr(v.p)||{};const hide=S.hideNames;
+  const areas=S.slices;
+  const isOpen=id=>!!(ui.so&&ui.so[id]);
+  const fin=[];
   const exRow=e=>{const hab=e.repeats,d=doneToday(e);return `<div class="qr ${!hab&&d?'done':''}">${hab?'':`<button class="qc ${d?'on':''}" data-a="sblog" data-id="${e.id}" ${d?'disabled':''} aria-label="Mark done">✓</button>`}<span class="t">${esc(e.name)}</span>${hab?`<button class="lg2" data-a="sblog" data-id="${e.id}">+ Log it</button>`:''}</div>`};
   const proj=x=>{const exs=projExps(x.id).filter(showable);return `<div class="pj">${hide?`<button data-a="cpick" data-id="${x.id}" aria-label="Pick a colour" style="padding:4px"><span style="display:block;width:18px;height:18px;border-radius:50%;background:${x.color||'#fff'};border:1.6px solid ${x.color||'#CFC9B8'}"></span></button><button class="pn" data-a="pgo" data-id="${x.id}" style="color:var(--ink-faint);font-weight:400">${x.id===p.id?'You are here':'Open ›'}</button>`:`<button class="pn ${x.id===p.id?'cur':''}" data-a="pgo" data-id="${x.id}">${esc(x.name)}</button><button class="icon-btn" style="border:none" data-a="prename" data-id="${x.id}" aria-label="Rename">✎</button><button class="icon-btn" style="border:none" data-a="pdelone" data-id="${x.id}" aria-label="Delete">${TRASH}</button>`}</div>${ui.cpick===x.id&&hide?`<div style="display:flex;gap:9px;align-items:center;flex-wrap:wrap;padding:2px 6px 10px 8px">${PAL.map(c=>`<button data-a="setcolor" data-id="${x.id}" data-c="${c}" aria-label="Colour" style="width:24px;height:24px;border-radius:50%;background:${c};${x.color===c?'outline:2px solid var(--ink);outline-offset:2px':''}"></button>`).join('')}<button class="link faint" data-a="setcolor" data-id="${x.id}" data-c="" style="font-size:12px;padding:4px">None</button></div>`:''}${exs.length?exs.map(exRow).join(''):'<div class="meta" style="margin:0 8px 8px">Nothing to do here yet.</div>'}`};
   return `<div class="side"><div class="pane"><div class="row" style="margin-bottom:12px"><b class="serif" style="font-size:24px;font-weight:500">Trials</b><button class="icon-btn" style="border:none" data-a="sideclose" aria-label="Close">✕</button></div>
   ${hide?`<p class="meta" style="margin:0 4px 10px;line-height:1.5">Names are hidden. Tap a circle to pick a colour so you can tell projects apart.</p>`:''}
-  ${areas.map(a=>`<button class="acc ${isOpen(a.id)?'open':''}" data-a="sacc" data-id="${a.id}"><i style="background:${a.color}"></i>${esc(a.name)}<span class="ar">${isOpen(a.id)?'▾':'▸'}</span></button>${isOpen(a.id)?`<div class="drop">${activeProjects(a.id).map(proj).join('')}</div>`:''}`).join('')}
-  <div class="row" style="margin-top:14px"><button class="link" data-a="addProject">+ Add project</button><span style="display:flex;gap:16px">${hide?'':`<button class="link faint" data-a="psel">Select</button>`}<button class="link" data-a="reveal">${hide?'Show':'Hide'} project names</button></span></div>
+  ${areas.map(a=>`<button class="acc ${isOpen(a.id)?'open':''}" data-a="sacc" data-id="${a.id}"><i style="background:${a.color}"></i>${esc(a.name)}<span class="ar">${isOpen(a.id)?'▾':'▸'}</span></button>${isOpen(a.id)?`<div class="drop">${activeProjects(a.id).map(proj).join('')}<button class="link" data-a="addProject" data-id="${a.id}" style="margin:6px 8px 10px">+ Add project</button></div>`:''}`).join('')}
+  <div class="row" style="margin-top:14px;justify-content:flex-end"><button class="link" data-a="reveal">${hide?'Show':'Hide'} project names</button></div>
   ${fin.length?`<div class="sec">Finished Projects</div>${fin.map(x=>`<button class="sitem" data-a="openFinished" data-id="${x.id}"><span class="dot"></span>${hide?'':esc(x.name)}</button>`).join('')}`:''}
   </div><div class="shade" data-a="sideclose"></div></div>`}
 
@@ -421,7 +421,7 @@ const A={
   startProject(){const n=val('pname');if(!n)return;const sid=newp?newp.s:v.s;const p={id:uid(),sliceId:sid,name:n,status:'active'};S.projects.push(p);S.lastProj[sid]=p.id;save();flash=true;go('lab',{p:p.id})},
   cancelNewBg(d){ },
   cancelNew(){newp=null;render()},
-  addProject(){ui.side=false;ui.menu=false;newp={s:pr(v.p).sliceId};render()},
+  addProject(d){ui.side=false;ui.menu=false;newp={s:(d&&d.id)||pr(v.p).sliceId};render()},
   lab(){go('lab',{p:v.p})},
   cprev(){slide=-1;flash=true;const act=activeProjects(pr(v.p).sliceId);if(act.length<2)return;const i=act.findIndex(x=>x.id===v.p);setProj(act[(i-1+act.length)%act.length].id);go('lab',{p:S.lastProj[pr(v.p).sliceId]})},
   cnext(){slide=1;flash=true;const act=activeProjects(pr(v.p).sliceId);if(act.length<2)return;const i=act.findIndex(x=>x.id===v.p);setProj(act[(i+1)%act.length].id);go('lab',{p:S.lastProj[pr(v.p).sliceId]})},
@@ -444,7 +444,7 @@ const A={
   calpick(d){ui.dd=d.d;render()},
   saveDate(d){const en=S.entries.find(x=>x.id===d.id);if(ui.dd)en.date=ui.dd;ui.ed=null;save();render()},
   sblog(d){const e=S.exps.find(x=>x.id===d.id);if(!e)return;if(!e.repeats&&doneToday(e))return;S.entries.push({id:uid(),expId:e.id,date:today(),ts:Date.now(),words:''});if(!e.repeats)e.status='done';save();toast('Logged');render()},
-  sacc(d){if(!ui.so){ui.so={};ui.so[pr(v.p).sliceId]=true}ui.so[d.id]=!ui.so[d.id];render()},
+  sacc(d){ui.so=ui.so||{};ui.so[d.id]=!ui.so[d.id];render()},
   saveWords(d){const en=S.entries.find(x=>x.id===d.id);en.words=val('w-'+d.id);save();ui.edit=null;render()},
   saveOverallRow(d){const e=S.exps.find(x=>x.id===d.id);e.overall=val('w-'+d.id);save();ui.edit=null;render()},
   delEntry(d){ask('Delete this?','This removes it from Completed for good. This can\'t be undone.','Delete',()=>{const en=S.entries.find(x=>x.id===d.id);const e=S.exps.find(x=>x.id===en.expId);S.entries=S.entries.filter(x=>x.id!==d.id);if(e&&!e.repeats&&e.status==='done'&&!countOf(e.id))S.exps=S.exps.filter(x=>x.id!==e.id);save()})},
@@ -466,7 +466,7 @@ const A={
   cpick(d){ui.cpick=ui.cpick===d.id?null:d.id;render()},
   setcolor(d){pr(d.id).color=d.c||null;save();ui.cpick=null;render()},
   reveal(){S.hideNames=!S.hideNames;save();render()},
-  pdelone(d){const x=pr(d.id);ask('Delete this project?',`“${x.name}” and everything in it — every experiment, any habit cards, all of it logged in Completed — will be gone for good. This can't be undone.`,'Delete',()=>{const sid=x.sliceId,was=v.p===x.id;delProject(x.id);save();const act=activeProjects(sid);if(act.length){S.lastProj[sid]=act[0].id;v={n:'lab',p:act[0].id}}else{ui.side=false;v={n:'start',s:sid}}})},
+  pdelone(d){const x=pr(d.id);ask('Delete this project?',`“${x.name}” and everything in it — every experiment, any habit cards, all of it logged in Completed — will be gone for good. This can't be undone.`,'Delete',()=>{const sid=x.sliceId,was=v.p===x.id;delProject(x.id);save();if(v.n==='pie')return;const act=activeProjects(sid);if(act.length){S.lastProj[sid]=act[0].id;v={n:'lab',p:act[0].id}}else{ui.side=false;v={n:'start',s:sid}}})},
   pgo(d){setProj(d.id);go('lab',{p:d.id})},
   prename(d){go('rename',{p:d.id})},
   saveRename(){const n=val('pname');if(n){pr(v.p).name=n;save()}go('lab',{p:v.p})},
