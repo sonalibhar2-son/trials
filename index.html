@@ -139,6 +139,20 @@ input,textarea{font:inherit;color:var(--ink)}
 .qr.done{opacity:.6}.qr.done .t{text-decoration:line-through}
 .lg2{background:var(--moss);color:#fff;font-size:11.5px;font-weight:500;padding:7px 11px;border-radius:14px;flex-shrink:0}
 .side .acc{background:var(--washi)}.side .drop{background:rgba(251,248,241,.5)}
+
+.qc{background:transparent;border:1.8px solid var(--moss);color:#fff}.qc.on{background:var(--moss)}
+.qr.foc{background:#fff;border-left:3px solid var(--moss);box-shadow:0 8px 18px -10px rgba(42,42,40,.3)}.qr.foc .t{font-weight:700}
+.qs{color:#B58A2F;font-size:17px;flex-shrink:0;padding:0 2px}
+.fh{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);margin:2px 4px 8px;display:flex;align-items:center;gap:7px}
+.pj2{display:flex;align-items:center;gap:6px;background:var(--washi);border-radius:12px;padding:4px 10px 4px 4px;margin:6px 0;font-size:14px;font-weight:600}.pj2.open{border-radius:12px 12px 0 0;margin-bottom:0}
+.pjt{flex:1;display:flex;align-items:center;gap:8px;text-align:left;padding:9px 8px;min-width:0}.pjt i{width:10px;height:10px;border-radius:50%;display:block;flex-shrink:0}.pjt .nmx{overflow:hidden;text-overflow:ellipsis}
+.pj2 .ey{font-size:13px;padding:6px;opacity:.7}.pj2 .ar{color:var(--ink-faint);font-size:11px;font-weight:400;padding:8px 4px}
+.pbody{background:rgba(246,242,230,.9);border-radius:0 0 12px 12px;padding:8px 8px 0;margin-bottom:6px}
+.side .pane{width:86%;max-width:360px}
+
+.pg{display:flex;align-items:center;justify-content:center;gap:8px;padding:4px 0 6px}
+.pg .ar2{font-size:24px;line-height:1;color:var(--ink-soft);padding:2px 12px;font-weight:600}.pg .ar2:disabled{opacity:.25}
+.pg .dots{display:flex;gap:6px;align-items:center}.pg .dots i{width:7px;height:7px;border-radius:4px;background:#D2CCBB;display:block;transition:.2s}.pg .dots i.on{background:var(--moss);width:18px}
 </style>
 </head>
 <body>
@@ -224,7 +238,7 @@ function carousel(p){
   return `<div class="carousel"><span></span><div class="cc"><button class="arr" data-a="cprev" ${multi?'':'disabled'}>‹</button><div class="dots">${act.map((x,j)=>`<i class="${j===i?'on':''}" style="${S.hideNames&&x.color?`background:${x.color};opacity:${j===i?1:.5}`:''}"></i>`).join('')}</div><button class="arr" data-a="cnext" ${multi?'':'disabled'}>›</button></div><button class="plus" data-a="addProject" style="justify-self:end" aria-label="Add project">+</button></div>`}
 
 function vLab(){
-  const p=pr(v.p);const exps=projExps(p.id).filter(e=>e.status==='pending');
+  const p=pr(v.p);const exps=projExps(p.id).filter(e=>e.status==='pending').sort((a,b)=>(isFocus(b)?1:0)-(isFocus(a)?1:0));
   const sel=ui.sel;
   let body;
   if(!exps.length){
@@ -236,7 +250,7 @@ function vLab(){
   }else{
     body=exps.map(e=>{
       const hab=e.repeats;const n=countOf(e.id);
-      return `<div class="card ${hab?'habit':''}"><div class="row" style="align-items:flex-start"><div><div class="item-name">${esc(e.name)}</div>${hab?'<span class="badge">Habit</span>':''}</div><button class="icon-btn" data-a="delExp" data-id="${e.id}" aria-label="Delete">✕</button></div>
+      return `<div class="card ${hab?'habit':''}"><div class="row" style="align-items:flex-start"><div><div class="item-name" ${isFocus(e)?'style="font-weight:700"':''}>${isFocus(e)?'<span style="color:#B58A2F">★ </span>':''}${esc(e.name)}</div>${hab?'<span class="badge">Habit</span>':''}</div><button class="icon-btn" data-a="delExp" data-id="${e.id}" aria-label="Delete">✕</button></div>
       <div class="actions"><button class="did" data-a="did" data-id="${e.id}">${hab?'+ Log it':'✓ I did it'}</button><button class="adj" data-a="adjust" data-id="${e.id}">Adjust</button></div>
       ${hab?`<button class="link" data-a="dates" data-id="${e.id}" style="display:block;width:100%;text-align:left;margin-top:12px;padding-top:10px;border-top:1px dashed var(--line)">Shown up <span class="${ui.pulse===e.id?'pulse':''}">${n}</span> ${n===1?'time':'times'}</button>`:''}</div>`}).join('')+'<div class="grow"></div>';
   }
@@ -254,6 +268,7 @@ return `${back('lab','Cancel')}<div class="crumb">${projCrumb()}</div><h1 class=
 <input id="ename" class="field" value="${esc(e.name)}" maxlength="120">
 <button class="set" data-a="togRep"><span><b>Repeats</b><small>${r?'This is a habit card now — every “Log it” adds to Completed automatically.':'Turn on and this becomes a habit card that stays put. Every “Log it” adds to Completed automatically.'}</small></span><span class="toggle ${r?'on':''}"><i></i></span></button>
 ${r?`<div class="card" style="margin-top:14px"><b style="font-weight:500">Mark done</b><p class="sub" style="margin:4px 0 12px;font-size:13px">Clears the card from the lab. Everything you've logged stays exactly as it is in Completed — nothing is deleted.</p><button class="btn out" data-a="doneNow">Mark done</button></div>`:''}
+${(()=>{const f=ui.foc??isFocus(e);return `<button class="set" data-a="togFocus"><span><b>Focus today</b><small>Pin this to the top of your lists for today. Up to three. It clears itself tomorrow.</small></span><span class="toggle ${f?'on':''}"><i></i></span></button>`})()}
 <div style="height:16px"></div><button class="btn" data-a="saveAdjust">Save</button>`}
 
 function vDates(){const e=S.exps.find(x=>x.id===v.e);const ens=S.entries.filter(x=>x.expId===e.id).sort((a,b)=>b.date.localeCompare(a.date)||b.ts-a.ts);
@@ -327,17 +342,16 @@ function vWhy(){return `<div class="why">${back(v.from||'pie','Back')}<h1 class=
 
 function sidebar(){
   if(v.n!=='pie')return sidebarOld();
-  const p=pr(v.p)||{};const hide=S.hideNames;
-  const areas=S.slices;
-  const isOpen=id=>!!(ui.so&&ui.so[id]);
-  const fin=[];
-  const exRow=e=>{const hab=e.repeats,d=doneToday(e);return `<div class="qr ${!hab&&d?'done':''}">${hab?'':`<button class="qc ${d?'on':''}" data-a="sblog" data-id="${e.id}" ${d?'disabled':''} aria-label="Mark done">✓</button>`}<span class="t">${esc(e.name)}</span>${hab?`<button class="lg2" data-a="sblog" data-id="${e.id}">+ Log it</button>`:''}</div>`};
-  const proj=x=>{const exs=projExps(x.id).filter(showable);return `<div class="pj">${hide?`<button data-a="cpick" data-id="${x.id}" aria-label="Pick a colour" style="padding:4px"><span style="display:block;width:18px;height:18px;border-radius:50%;background:${x.color||'#fff'};border:1.6px solid ${x.color||'#CFC9B8'}"></span></button><button class="pn" data-a="pgo" data-id="${x.id}" style="color:var(--ink-faint);font-weight:400">${x.id===p.id?'You are here':'Open ›'}</button>`:`<button class="pn ${x.id===p.id?'cur':''}" data-a="pgo" data-id="${x.id}">${esc(x.name)}</button><button class="icon-btn" style="border:none" data-a="prename" data-id="${x.id}" aria-label="Rename">✎</button><button class="icon-btn" style="border:none" data-a="pdelone" data-id="${x.id}" aria-label="Delete">${TRASH}</button>`}</div>${ui.cpick===x.id&&hide?`<div style="display:flex;gap:9px;align-items:center;flex-wrap:wrap;padding:2px 6px 10px 8px">${PAL.map(c=>`<button data-a="setcolor" data-id="${x.id}" data-c="${c}" aria-label="Colour" style="width:24px;height:24px;border-radius:50%;background:${c};${x.color===c?'outline:2px solid var(--ink);outline-offset:2px':''}"></button>`).join('')}<button class="link faint" data-a="setcolor" data-id="${x.id}" data-c="" style="font-size:12px;padding:4px">None</button></div>`:''}${exs.length?exs.map(exRow).join(''):'<div class="meta" style="margin:0 8px 8px">Nothing to do here yet.</div>'}`};
+  const hide=S.hideNames;
+  const isHidden=x=>hide||!!x.hideName;
+  const exRow=e=>{const hab=e.repeats,d=doneToday(e),f=isFocus(e);return `<div class="qr ${!hab&&d?'done':''} ${f?'foc':''}">${hab?'':`<button class="qc ${d?'on':''}" data-a="sblog" data-id="${e.id}" ${d?'disabled':''} aria-label="Mark done">${d?'✓':''}</button>`}<span class="t">${esc(e.name)}</span>${hab?`<button class="lg2" data-a="sblog" data-id="${e.id}">+ Log it</button>`:''}${f?`<button class="qs" data-a="unfocus" data-id="${e.id}" aria-label="Remove focus">★</button>`:''}</div>`};
+  const proj=x=>{const rank=e=>isFocus(e)?0:(!e.repeats&&doneToday(e))?2:1;const all=projExps(x.id).filter(showable).sort((a,b)=>rank(a)-rank(b));const pages=Math.ceil(all.length/3);const showAll=!!(ui.all&&ui.all[x.id])||pages<=1;const pg=Math.min(Math.max(0,(ui.pg&&ui.pg[x.id])||0),Math.max(0,pages-1));const exs=showAll?all:all.slice(pg*3,pg*3+3);const pager=pages>1?(showAll?`<div class="pg"><button class="link" style="font-size:12.5px" data-a="pshowall" data-id="${x.id}">Show 3 at a time</button></div>`:`<div class="pg"><button class="ar2 ${pg===0?'off':''}" data-a="ppg" data-id="${x.id}" data-n="-1" ${pg===0?'disabled':''} aria-label="Previous">‹</button><div class="dots">${Array.from({length:pages},(_,i)=>`<i class="${i===pg?'on':''}"></i>`).join('')}</div><button class="ar2 ${pg===pages-1?'off':''}" data-a="ppg" data-id="${x.id}" data-n="1" ${pg===pages-1?'disabled':''} aria-label="Next">›</button></div><div class="center"><button class="link faint" style="font-size:12px;padding:0 0 8px" data-a="pshowall" data-id="${x.id}">Show all</button></div>`):'';const open=!!(ui.pop&&ui.pop[x.id]);const hid=isHidden(x);const col=x.color||sl(x.sliceId).color;
+    return `<div class="pj2 ${open?'open':''}"><button class="pjt" data-a="pacc" data-id="${x.id}"><i style="background:${col}"></i><span class="nmx" ${hid?'style="color:var(--ink-faint);font-weight:400"':''}>${hid?'Hidden':esc(x.name)}</span></button>${hide?'':`<button class="ey" data-a="phide" data-id="${x.id}" aria-label="${x.hideName?'Show name':'Hide name'}">${x.hideName?'🙈':'👁'}</button>`}<button class="ar" data-a="pacc" data-id="${x.id}">${open?'▾':'▸'}</button></div>${open?`<div class="pbody">${hid?`<div style="display:flex;gap:9px;align-items:center;flex-wrap:wrap;padding:2px 4px 10px">${PAL.map(c=>`<button data-a="setcolor" data-id="${x.id}" data-c="${c}" aria-label="Colour" style="width:22px;height:22px;border-radius:50%;background:${c};${x.color===c?'outline:2px solid var(--ink);outline-offset:2px':''}"></button>`).join('')}</div>`:''}${exs.length?exs.map(exRow).join(''):'<div class="meta" style="margin:0 6px 8px">Nothing to do here yet.</div>'}${pager}<div style="display:flex;gap:16px;padding:2px 6px 10px"><button class="link" style="font-size:12px" data-a="pgo" data-id="${x.id}">Open lab</button>${hid?'':`<button class="link faint" style="font-size:12px" data-a="prename" data-id="${x.id}">Rename</button>`}<button class="link faint" style="font-size:12px;color:var(--red)" data-a="pdelone" data-id="${x.id}">Delete</button></div></div>`:''}`};
+  const foc=liveExps().filter(e=>isFocus(e)&&showable(e));
   return `<div class="side"><div class="pane"><div class="row" style="margin-bottom:12px"><b class="serif" style="font-size:24px;font-weight:500">Trials</b><button class="icon-btn" style="border:none" data-a="sideclose" aria-label="Close">✕</button></div>
-  ${hide?`<p class="meta" style="margin:0 4px 10px;line-height:1.5">Names are hidden. Tap a circle to pick a colour so you can tell projects apart.</p>`:''}
-  ${areas.map(a=>`<button class="acc ${isOpen(a.id)?'open':''}" data-a="sacc" data-id="${a.id}"><i style="background:${a.color}"></i>${esc(a.name)}<span class="ar">${isOpen(a.id)?'▾':'▸'}</span></button>${isOpen(a.id)?`<div class="drop">${activeProjects(a.id).map(proj).join('')}<button class="link" data-a="addProject" data-id="${a.id}" style="margin:6px 8px 10px">+ Add project</button></div>`:''}`).join('')}
-  <div class="row" style="margin-top:14px;justify-content:flex-end"><button class="link" data-a="reveal">${hide?'Show':'Hide'} project names</button></div>
-  ${fin.length?`<div class="sec">Finished Projects</div>${fin.map(x=>`<button class="sitem" data-a="openFinished" data-id="${x.id}"><span class="dot"></span>${hide?'':esc(x.name)}</button>`).join('')}`:''}
+  ${foc.length?`<div class="fh"><span style="color:#B58A2F">★</span>Focus today</div>${foc.map(exRow).join('')}<div style="height:8px"></div><div class="fh">Areas</div>`:''}
+  ${S.slices.map(a=>`<button class="acc ${ui.so&&ui.so[a.id]?'open':''}" data-a="sacc" data-id="${a.id}"><i style="background:${a.color}"></i>${esc(a.name)}<span class="ar">${ui.so&&ui.so[a.id]?'▾':'▸'}</span></button>${ui.so&&ui.so[a.id]?`<div class="drop">${activeProjects(a.id).map(proj).join('')}<button class="link" data-a="addProject" data-id="${a.id}" style="margin:6px 8px 10px">+ Add project</button></div>`:''}`).join('')}
+  <div class="row" style="margin-top:14px;justify-content:flex-end"><button class="link" data-a="reveal">${hide?'Show':'Hide'} all project names</button></div>
   </div><div class="shade" data-a="sideclose"></div></div>`}
 
 function sidebarOld(){
@@ -357,6 +371,9 @@ function vRename(){const p=pr(v.p);return `${back('lab','Cancel')}<h1 class="h2"
 
 
 const isoOf=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const liveExps=()=>S.exps.filter(e=>{const p=pr(e.projectId);return p&&p.status==='active'});
+const isFocus=e=>e.focusDate===today();
+const focusCount=()=>liveExps().filter(isFocus).length;
 const doneToday=e=>S.entries.some(n=>n.expId===e.id&&n.date===today());
 const showable=e=>e.status==='pending'||(e.status==='done'&&doneToday(e));
 const calHTML=(sel,act)=>{const t=today();const [a,b,c]=t.split('-').map(Number);const td=new Date(a,b-1,c);const dow=(td.getDay()+6)%7;const st=new Date(td);st.setDate(td.getDate()-dow-21);
@@ -431,7 +448,13 @@ const A={
   delExp(d){const e=S.exps.find(x=>x.id===d.id);ask(e.repeats?'Delete this habit?':'Delete this experiment?',e.repeats?`“${e.name}” and everything logged under it in Completed — every date, every word you wrote — will be gone for good. This can't be undone.`:`“${e.name}” will be removed. Nothing is logged.`,'Delete',()=>{delExp(e.id);save()})},
   adjust(d){go('adjust',{p:v.p,e:d.id})},
   togRep(){const e=S.exps.find(x=>x.id===v.e);const keep=val('ename');ui.rep=!(ui.rep??e.repeats);ui.name=keep;render();document.getElementById('ename').value=keep},
-  saveAdjust(){const e=S.exps.find(x=>x.id===v.e);const n=val('ename');if(n)e.name=n;e.repeats=ui.rep??e.repeats;save();go('lab',{p:v.p})},
+  saveAdjust(){const e=S.exps.find(x=>x.id===v.e);const n=val('ename');if(n)e.name=n;e.repeats=ui.rep??e.repeats;if(ui.foc!==undefined){if(ui.foc&&!isFocus(e)){if(focusCount()>=3)toast('Three is plenty for one day');else e.focusDate=today()}else if(!ui.foc)e.focusDate=null}save();go('lab',{p:v.p})},
+  togFocus(){const e=S.exps.find(x=>x.id===v.e);const keep=val('ename');ui.foc=!(ui.foc??isFocus(e));ui.name=keep;render();document.getElementById('ename').value=keep},
+  unfocus(d){const e=S.exps.find(x=>x.id===d.id);e.focusDate=null;save();render()},
+  ppg(d){ui.pg=ui.pg||{};ui.pg[d.id]=Math.max(0,(ui.pg[d.id]||0)+Number(d.n));render()},
+  pshowall(d){ui.all=ui.all||{};ui.all[d.id]=!ui.all[d.id];render()},
+  pacc(d){ui.pop=ui.pop||{};ui.pop[d.id]=!ui.pop[d.id];render()},
+  phide(d){const x=pr(d.id);x.hideName=!x.hideName;save();render()},
   doneNow(){const e=S.exps.find(x=>x.id===v.e);e.status='doneForNow';save();toast('Marked done — still in Completed');go('lab',{p:v.p})},
   dates(d){const e=S.exps.find(x=>x.id===d.id);go('dates',{p:e.projectId,e:e.id,from:d.from||'lab'})},
   bringBack(){const e=S.exps.find(x=>x.id===v.e);e.status='pending';save();toast('Back in the lab');go('lab',{p:e.projectId})},
