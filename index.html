@@ -155,6 +155,10 @@ input,textarea{font:inherit;color:var(--ink)}
 .segc{display:flex;background:var(--stone);border-radius:30px;padding:8px;margin:10px 0 20px;gap:4px}
 .segc button{flex:1;padding:15px 6px;border-radius:24px;font-size:15px;font-weight:600;color:var(--ink-soft)}
 .segc button.on{background:var(--brand);color:var(--on-moss);box-shadow:0 8px 16px -8px rgba(0,0,0,.4)}
+/* zoom − + */
+.zm{display:flex;background:var(--stone);border-radius:28px;height:56px;padding:0 4px;align-items:center}
+.zm button{width:38px;height:48px;font-size:22px;font-weight:500;color:var(--ink);border-radius:24px}
+.zm button:disabled{opacity:.3}
 /* footer */
 #foot{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--washi);border-top:1px solid var(--line);padding:9px 0 calc(9px + env(safe-area-inset-bottom))}
 #foot .in{max-width:520px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr)}
@@ -297,6 +301,8 @@ function card(e,col){
   <div class="actions"><button class="did" data-a="did" data-id="${e.id}">${hab?'+ Log it':'✓ I did it'}</button><button class="adj" data-a="adjust" data-id="${e.id}">Edit</button></div>
   ${hab?`<div class="cfoot"><span>Shown up <span class="${ui.pulse===e.id?'pulse':''}">${n}</span> ${n===1?'time':'times'}${t?' · today ✓':''}</span><button class="link" data-a="markDone" data-id="${e.id}">Mark done</button></div>`:''}</div>`}
 
+const ZS=[70,80,90,100,115,130];
+const labZ=()=>ZS.includes(S.labZoom)?S.labZoom:90;
 function vLab(){
   const p=pr(v.p),col=sl(p.sliceId).color;
   const exps=projExps(p.id).filter(e=>e.status==='pending').sort((a,b)=>(isPinned(b)?1:0)-(isPinned(a)?1:0));
@@ -313,10 +319,10 @@ function vLab(){
   const menu=ui.menu?`<div class="menu"><div class="mh">${esc(dn(p))}</div><hr><button data-a="selMode">Select experiments to delete</button><button data-a="delAll" style="color:var(--red)">Delete all experiments</button><hr><button data-a="finish">Mark project as finished</button></div>`:'';
   const tip=S.tipHidden?`<button class="tipshow" data-a="tipShow"><span style="color:var(--ink-faint)">${BARS}</span>Show tip: where is my project?</button>`:
   `<div class="tipbox"><button class="tipbtn" data-a="side"><span class="lab-icon">${BARS}</span><span>Open the <b>menu</b> to reveal the project these experiments are for. Projects are hidden so you can focus on the process.</span></button><button class="hm" data-a="tipHide">Hide this message</button></div>`;
-  return `<div class="row"><button class="lab-icon" style="width:56px;height:56px" data-a="side" aria-label="Projects menu">${BARS}</button>
-  <span class="row" style="gap:10px"><button class="pill" style="padding:15px 22px;font-size:16px" data-a="addExp">+ Experiment</button><button class="lab-icon" style="width:56px;height:56px;font-weight:700;font-size:18px" data-a="menu" aria-label="More">⋯</button><button class="lab-icon" style="width:56px;height:56px" data-a="zoom" aria-label="${S.zoomOut?'Zoom in':'Zoom out'}" title="${S.zoomOut?'Zoom in':'Zoom out'}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.8-4.8M7.5 10.5h6${S.zoomOut?'M10.5 7.5v6':''}"/></svg></button></span></div>${menu}
-  <div style="display:flex;flex-direction:column;flex:1${S.zoomOut?';zoom:.75':''}"><div style="margin-top:14px">${back('pie','Pie')}</div><h1 class="h1" style="font-size:30px;margin:8px 0 14px">${projCrumb()}</h1>${sel?'':tip}${body}
-  ${sel?'':`<div class="nav" style="margin-top:12px"><button data-a="completed">Completed</button><button data-a="grat">Gratitude</button></div>${pager(p)}`}</div>`}
+  return `<div class="row" style="zoom:${Math.min(labZ(),90)/100}"><button class="lab-icon" style="width:56px;height:56px" data-a="side" aria-label="Projects menu">${BARS}</button>
+  <span class="row" style="gap:10px"><button class="pill" style="padding:15px 22px;font-size:16px" data-a="addExp">+ Experiment</button><button class="lab-icon" style="width:56px;height:56px;font-weight:700;font-size:18px" data-a="menu" aria-label="More">⋯</button><span class="zm" role="group" aria-label="Zoom"><button data-a="zoomOut" aria-label="Zoom out" ${labZ()<=ZS[0]?'disabled':''}>−</button><button data-a="zoomIn" aria-label="Zoom in" ${labZ()>=ZS[ZS.length-1]?'disabled':''}>+</button></span></span></div>${menu}
+  <div style="display:flex;flex-direction:column;flex:1;zoom:${labZ()/100}"><div style="margin-top:14px">${back('pie','Pie')}</div><h1 class="h1" style="font-size:30px;margin:8px 0 14px">${projCrumb()}</h1>${sel?'':tip}${body}
+  ${sel?'':`<div class="nav" style="margin-top:12px"><button data-a="completed">Completed</button><button data-a="grat">Gratitude</button></div><div style="zoom:${Math.min(labZ(),90)/labZ()}">${pager(p)}</div>`}</div>`}
 
 function vAdd(){return `${back('lab','Lab')}<div class="crumb">${projCrumb()}</div><h1 class="h2">What will you try today?</h1><p class="sub">Keep it tiny and doable.</p>
 <input id="ename" class="field" placeholder="e.g. Read one page" autocomplete="off" maxlength="120"><button class="btn" data-a="saveExp">Add experiment</button>`}
@@ -387,11 +393,11 @@ function vFinLab(){const p=pr(v.p);return `${back('finished','Finished')}<div cl
 
 function vCustom(){
   const rows=S.slices.map(s=>{const act=activeProjects(s.id).length;return `<div class="prow"><button class="swatch" style="background:${s.color}" data-a="pal" data-id="${s.id}" aria-label="Color"></button>
-  <input data-a="rename" data-id="${s.id}" value="${esc(s.name)}" maxlength="24">${act?`<span class="meta" style="margin:0;text-align:right;color:var(--clay)">${act} active<br>project</span>`:''}<button class="icon-btn" ${act?'style="opacity:.35"':''} data-a="delSlice" data-id="${s.id}">✕</button></div>
+  <input data-a="rename" data-id="${s.id}" value="${esc(s.name)}" maxlength="24">${act?`<span class="meta" style="margin:0;text-align:right;color:var(--clay)">${act} active<br>project</span>`:''}<button class="icon-btn" data-a="delSlice" data-id="${s.id}">✕</button></div>
   ${ui.pal===s.id?`<div class="pal">${PAL.map(c=>`<button style="background:${c}" data-a="color" data-id="${s.id}" data-c="${c}"></button>`).join('')}</div>`:''}`}).join('');
   return `<h1 class="h2" style="margin-top:14px">Customize Your Pie</h1><p class="sub">Rename a slice or pick a new color. Nothing here is required.</p>${rows}
   <div style="display:flex;gap:10px;margin-top:6px"><button class="link" data-a="addSlice" style="flex:1;border:1.4px dashed var(--line);border-radius:var(--r-lg);padding:15px">+ Add Slice</button><button class="link faint" data-a="reset" style="flex:1;border:1.4px dashed var(--line);border-radius:var(--r-lg);padding:15px">↺ Reset</button></div>
-  <div class="grow"></div>${S.slices.some(s=>activeProjects(s.id).length)?'<p class="meta center" style="margin:18px 0 0">A slice with active work can’t be removed — mark its project finished first.</p>':''}
+  <div class="grow"></div>${S.slices.some(s=>activeProjects(s.id).length)?'<p class="meta center" style="margin:18px 0 0">Removing a slice also deletes the projects inside it.</p>':''}
   <div class="row" style="margin-top:18px"><button class="link faint" data-a="cancelCustom" style="font-size:14px;padding:10px 4px">Cancel</button><button class="btn dark" data-a="saveCustom" style="width:auto;padding:13px 38px">Save</button></div>`}
 
 function vWhy(){return `<div class="why">${v.from==='onboard'?back('onboard','Back'):''}<h1 class="h1" style="font-size:34px;margin:8px 0 6px">How Trials works</h1>
@@ -507,7 +513,8 @@ const A={
   tipHide(){S.tipHidden=true;save();render()},tipShow(){S.tipHidden=false;save();render()},
   addExp(){go('addExp',{p:v.p})},
   saveExp(){const n=val('ename');if(!n)return;S.exps.push({id:uid(),projectId:v.p,name:n,repeats:false,status:'pending'});save();go('lab',{p:v.p})},
-  zoom(){S.zoomOut=!S.zoomOut;save();render()},
+  zoomOut(){const i=ZS.indexOf(labZ());if(i>0){S.labZoom=ZS[i-1];save();render();toast(S.labZoom+'%')}},
+  zoomIn(){const i=ZS.indexOf(labZ());if(i<ZS.length-1){S.labZoom=ZS[i+1];save();render();toast(S.labZoom+'%')}},
   setType(d){const e=X(d.id),log=d.k==='log';if(!!e.repeats===log)return;e.repeats=log;save();toast(log?'Repeat experiment':'One-time experiment');render()},
   pin(d){const e=X(d.id);if(isPinned(e)){e.focusDate=null;save();toast('Unpinned');return render()}if(pinnedList().length>=3){toast('You can pin three a day. Unpin one first.');return}e.focusDate=today();save();toast('Pinned to the top for today');render()},
   did(d){const e=X(d.id);if(!e||(!e.repeats&&e.status==='done'))return;mut(()=>{S.entries.push({id:uid(),expId:e.id,date:today(),ts:Date.now(),words:''});if(!e.repeats){e.status='done';e.focusDate=null}const n=countOf(e.id);ui.pulse=e.repeats?e.id:null;return e.repeats?`Logged. Shown up ${n} ${n===1?'time':'times'}.`:'Done. It’s in Completed.'});render()},
@@ -568,7 +575,9 @@ const A={
   pal(d){ui.pal=ui.pal===d.id?null:d.id;render()},
   color(d){sl(d.id).color=d.c;save();ui.pal=null;render()},
   addSlice(){S.slices.push({id:uid(),name:'New slice',color:PAL[S.slices.length%7],isDefault:false});save();render();const i=document.querySelectorAll('.prow input');const l=i[i.length-1];l&&(l.focus(),l.select())},
-  delSlice(d){const s=sl(d.id);if(activeProjects(s.id).length){toast('Mark its project finished first');return}if(S.slices.length<=1){toast('Keep at least one slice');return}ask('Remove this slice?',`“${s.name}” will be removed.`,'Remove',()=>{S.slices=S.slices.filter(x=>x.id!==s.id);save()})},
+  delSlice(d){const s=sl(d.id);if(S.slices.length<=1){toast('Keep at least one slice');return}
+    const ps=S.projects.filter(p=>p.sliceId===s.id);const n=ps.length;
+    ask('Delete “'+s.name+'”?',n?`This also deletes ${n===1?'its project':'its '+n+' projects'} and every experiment and log inside. This can't be undone. Want to keep a copy? Download a backup in Settings first.`:`“${s.name}” will be removed from your pie.`,'Delete',()=>{ps.forEach(p=>delProject(p.id));S.slices=S.slices.filter(x=>x.id!==s.id);save()})},
   reset(){ask('Reset to the default 7?','Any slices you\'ve added or renamed will be removed, along with everything inside them — projects, hidden goals, history. Your current setup will be kept for 30 days in case you change your mind, then deleted for good.','Reset',()=>{
     S.backup={slices:S.slices,projects:S.projects,exps:S.exps,entries:S.entries,lastProj:S.lastProj,expiresAt:Date.now()+30*864e5};
     S.slices=JSON.parse(JSON.stringify(DEF));const ids=new Set(S.slices.map(s=>s.id));
