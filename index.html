@@ -292,7 +292,7 @@ function pager(p){
 function card(e,col){
   const hab=e.repeats,n=countOf(e.id),pn=isPinned(e),t=doneToday(e);
   return `<div class="card ${hab?'habit':''} ${pn?'pin':''}" ${hab?`style="border-left-color:${col}"`:''}><div class="row" style="align-items:flex-start"><div class="item-name">${esc(e.name)}</div><span class="row" style="gap:8px;flex-shrink:0"><button class="icon-btn ${pn?'on':''}" style="width:42px;height:42px" data-a="pin" data-id="${e.id}" title="${pn?'Pinned for today':'Pin for today'}" aria-label="${pn?'Unpin':'Pin for today'}">${PIN(pn)}</button><button class="icon-btn" style="width:42px;height:42px" data-a="rmExp" data-id="${e.id}" aria-label="Remove">✕</button></span></div>
-  <div class="sw"><button class="${hab?'':'on'}" data-a="setType" data-id="${e.id}" data-k="check">✓ Check to complete</button><button class="${hab?'on':''}" data-a="setType" data-id="${e.id}" data-k="log">↻ Log mode</button></div>
+  <div class="sw"><button class="${hab?'':'on'}" data-a="setType" data-id="${e.id}" data-k="check">✓ Do once</button><button class="${hab?'on':''}" data-a="setType" data-id="${e.id}" data-k="log">↻ Log mode</button></div>
   ${pn?'<div><span class="tag">Pinned for today</span></div>':''}
   <div class="actions"><button class="did" data-a="did" data-id="${e.id}">${hab?'+ Log it':'✓ I did it'}</button><button class="adj" data-a="adjust" data-id="${e.id}">Edit</button></div>
   ${hab?`<div class="cfoot"><span>Shown up <span class="${ui.pulse===e.id?'pulse':''}">${n}</span> ${n===1?'time':'times'}${t?' · today ✓':''}</span><button class="link" data-a="markDone" data-id="${e.id}">Mark done</button></div>`:''}</div>`}
@@ -314,9 +314,9 @@ function vLab(){
   const tip=S.tipHidden?`<button class="tipshow" data-a="tipShow"><span style="color:var(--ink-faint)">${BARS}</span>Show tip: where is my project?</button>`:
   `<div class="tipbox"><button class="tipbtn" data-a="side"><span class="lab-icon">${BARS}</span><span>Open the <b>menu</b> to reveal the project these experiments are for. Projects are hidden so you can focus on the process.</span></button><button class="hm" data-a="tipHide">Hide this message</button></div>`;
   return `<div class="row"><button class="lab-icon" style="width:56px;height:56px" data-a="side" aria-label="Projects menu">${BARS}</button>
-  <span class="row" style="gap:10px"><button class="pill" style="padding:15px 22px;font-size:16px" data-a="addExp">+ Experiment</button><button class="lab-icon" style="width:56px;height:56px;font-weight:700;font-size:18px" data-a="menu" aria-label="More">⋯</button></span></div>${menu}
-  <div style="margin-top:14px">${back('pie','Pie')}</div><h1 class="h1" style="font-size:30px;margin:8px 0 14px">${projCrumb()}</h1>${sel?'':tip}${body}
-  ${sel?'':`<div class="nav" style="margin-top:12px"><button data-a="completed">Completed</button><button data-a="grat">Gratitude</button></div>${pager(p)}`}`}
+  <span class="row" style="gap:10px"><button class="pill" style="padding:15px 22px;font-size:16px" data-a="addExp">+ Experiment</button><button class="lab-icon" style="width:56px;height:56px;font-weight:700;font-size:18px" data-a="menu" aria-label="More">⋯</button><button class="lab-icon" style="width:56px;height:56px" data-a="zoom" aria-label="${S.zoomOut?'Zoom in':'Zoom out'}" title="${S.zoomOut?'Zoom in':'Zoom out'}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.8-4.8M7.5 10.5h6${S.zoomOut?'M10.5 7.5v6':''}"/></svg></button></span></div>${menu}
+  <div style="display:flex;flex-direction:column;flex:1${S.zoomOut?';zoom:.75':''}"><div style="margin-top:14px">${back('pie','Pie')}</div><h1 class="h1" style="font-size:30px;margin:8px 0 14px">${projCrumb()}</h1>${sel?'':tip}${body}
+  ${sel?'':`<div class="nav" style="margin-top:12px"><button data-a="completed">Completed</button><button data-a="grat">Gratitude</button></div>${pager(p)}`}</div>`}
 
 function vAdd(){return `${back('lab','Lab')}<div class="crumb">${projCrumb()}</div><h1 class="h2">What will you try today?</h1><p class="sub">Keep it tiny and doable.</p>
 <input id="ename" class="field" placeholder="e.g. Read one page" autocomplete="off" maxlength="120"><button class="btn" data-a="saveExp">Add experiment</button>`}
@@ -399,7 +399,7 @@ function vWhy(){return `<div class="why">${v.from==='onboard'?back('onboard','Ba
 <h3>Why this app is about actions, not outcomes.</h3><p>The goal isn't something you're secretly working toward in the background — it's meant to actually leave your mind. What's left is just the next experiment.</p>
 <h3>Why we encourage small steps.</h3><p>Confidence isn't built by attempting hard things — it's built by a track record of actually doing them. The more doable a step is, the more likely you are to actually finish it — and that's what adds up.</p>
 <h3>Why we ask who you're becoming.</h3><p>Every action is evidence of who you're becoming, not proof of how far you have left to go. In Completed, tap “+ Add your identity” under anything you've done and finish the sentence “I'm someone who…” in your own words, or pick a suggestion. Naming it yourself sticks more than anything the app could say for you.</p>
-<h3>Why experiments work two ways.</h3><p>Every card has a small switch. Most things you add are Check to complete — do it once, tap “I did it,” and it goes straight into Completed. Some things you'll want to keep showing up for. Flip the card to Log mode and it stays put, with a “Log it” button that adds to a quiet count. “Mark done” sends it away — nothing is deleted, and you can bring it back any time.</p>
+<h3>Why experiments work two ways.</h3><p>Every card has a small switch. Most things you add are Do once — do it once, tap “I did it,” and it goes straight into Completed. Some things you'll want to keep showing up for. Flip the card to Log mode and it stays put, with a “Log it” button that adds to a quiet count. “Mark done” sends it away — nothing is deleted, and you can bring it back any time.</p>
 <h3>Why you can only pin three.</h3><p>Tap the pin on any card to keep it at the top for today. Three is enough to guide a day without turning it into a to-do list. Pins clear themselves tomorrow, so every day starts fresh.</p></div>`}
 
 function sidebar(){
@@ -507,7 +507,8 @@ const A={
   tipHide(){S.tipHidden=true;save();render()},tipShow(){S.tipHidden=false;save();render()},
   addExp(){go('addExp',{p:v.p})},
   saveExp(){const n=val('ename');if(!n)return;S.exps.push({id:uid(),projectId:v.p,name:n,repeats:false,status:'pending'});save();go('lab',{p:v.p})},
-  setType(d){const e=X(d.id),log=d.k==='log';if(!!e.repeats===log)return;e.repeats=log;save();toast(log?'Log mode: tap “Log it” each time you do it':'Check to complete: tap “I did it” once');render()},
+  zoom(){S.zoomOut=!S.zoomOut;save();render()},
+  setType(d){const e=X(d.id),log=d.k==='log';if(!!e.repeats===log)return;e.repeats=log;save();toast(log?'Repeat experiment':'One-time experiment');render()},
   pin(d){const e=X(d.id);if(isPinned(e)){e.focusDate=null;save();toast('Unpinned');return render()}if(pinnedList().length>=3){toast('You can pin three a day. Unpin one first.');return}e.focusDate=today();save();toast('Pinned to the top for today');render()},
   did(d){const e=X(d.id);if(!e||(!e.repeats&&e.status==='done'))return;mut(()=>{S.entries.push({id:uid(),expId:e.id,date:today(),ts:Date.now(),words:''});if(!e.repeats){e.status='done';e.focusDate=null}const n=countOf(e.id);ui.pulse=e.repeats?e.id:null;return e.repeats?`Logged. Shown up ${n} ${n===1?'time':'times'}.`:'Done. It’s in Completed.'});render()},
   markDone(d){const e=X(d.id);mut(()=>{e.status='doneForNow';e.focusDate=null;return'Marked done. Still in Completed.'});if(d.back)go('lab',{p:v.p});else render()},
