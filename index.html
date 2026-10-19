@@ -467,7 +467,7 @@ function applyTheme(){
 }
 function footer(){
   const f=document.getElementById('foot');
-  if(v.n==='onboard'){f.hidden=true;return}
+  if(!USER||['onboard','loading','signin','offline'].includes(v.n)){f.hidden=true;return}
   const cur=['settings','finished','finlab'].includes(v.n)?'settings':v.n==='why'?'why':'pie';
   const b=(k,i,l,a)=>`<button class="${cur===k?'on':''}" data-a="${a}" ${cur===k?'aria-current="page"':''}>${i}<span>${l}</span></button>`;
   f.innerHTML=`<div class="in">${b('pie',T_PIE,'Pie','tabPie')}${b('settings',T_SET,'Settings','tabSettings')}${b('why',T_BOOK,'How Trials works','tabWhy')}</div>`;f.hidden=false;
