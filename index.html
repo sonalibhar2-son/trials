@@ -12,9 +12,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Zen+Old+Mincho:wght@400;500;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-:root{--washi:#FBF8F1;--stone:#F1ECDD;--card:#fff;--ink:#2A2A28;--on-ink:#fff;--ink-soft:#6E6B63;--ink-faint:#9F9A8E;--line:#E1DCCF;--moss:#2C4A34;--on-moss:#fff;--brand:#2C4A34;--clay:#A8763A;--red:#A5483D;
+:root{--rose:#96525F;--rose-bg:#F3E4E6;--washi:#FBF8F1;--stone:#F1ECDD;--card:#fff;--ink:#2A2A28;--on-ink:#fff;--ink-soft:#6E6B63;--ink-faint:#9F9A8E;--line:#E1DCCF;--moss:#2C4A34;--on-moss:#fff;--brand:#2C4A34;--clay:#A8763A;--red:#A5483D;
 --r-lg:20px;--r-md:14px;--r-pill:22px;--shadow-card:0 10px 22px -12px rgba(42,42,40,.2);--shadow-accent:0 10px 22px -10px rgba(44,74,52,.24);--scrim:rgba(42,42,40,.38)}
-:root[data-theme=dark]{--washi:#1D1C19;--stone:#2A2925;--card:#33322D;--ink:#EDE8DB;--on-ink:#1D1C19;--ink-soft:#B6B1A3;--ink-faint:#8A8676;--line:#3D3B34;--moss:#8DB89A;--on-moss:#1D1C19;--brand:#8DB89A;--clay:#D2A064;--red:#D9776A;--shadow-card:0 10px 22px -12px rgba(0,0,0,.6);--shadow-accent:0 10px 22px -10px rgba(0,0,0,.6);--scrim:rgba(0,0,0,.55)}
+:root[data-theme=dark]{--rose:#E2A4B0;--rose-bg:#3A2A2D;--washi:#1D1C19;--stone:#2A2925;--card:#33322D;--ink:#EDE8DB;--on-ink:#1D1C19;--ink-soft:#B6B1A3;--ink-faint:#8A8676;--line:#3D3B34;--moss:#8DB89A;--on-moss:#1D1C19;--brand:#8DB89A;--clay:#D2A064;--red:#D9776A;--shadow-card:0 10px 22px -12px rgba(0,0,0,.6);--shadow-accent:0 10px 22px -10px rgba(0,0,0,.6);--scrim:rgba(0,0,0,.55)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--washi)}
 body{font-family:'Zen Kaku Gothic New',sans-serif;color:var(--ink);display:flex;justify-content:center}
@@ -159,6 +159,11 @@ input,textarea{font:inherit;color:var(--ink)}
 .zm{display:flex;align-items:center;gap:0}
 .zm button{width:36px;height:44px;display:flex;align-items:center;justify-content:center;color:var(--ink)}
 .zm button:disabled{opacity:.3}
+/* gratitude challenge */
+.gpill{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--rose);background:var(--rose-bg);border-radius:16px;padding:6px 12px 6px 7px}
+.ppill{display:flex;align-items:center;gap:5px}
+.gsel{width:100%;background:var(--stone);border:1.4px solid var(--line);border-radius:12px;padding:13px;font-size:15px;color:var(--ink);margin:8px 0 6px}
+@media (max-width:340px){.npill{padding:9px 10px;font-size:12.5px;gap:5px}.zm button{width:28px}.zm svg{width:20px;height:20px}.pager{gap:4px}.pgl{gap:3px}.ar2{width:36px;height:36px}}
 /* footer */
 #foot{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--washi);border-top:1px solid var(--line);padding:9px 0 calc(9px + env(safe-area-inset-bottom))}
 #foot .in{max-width:520px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr)}
@@ -267,6 +272,54 @@ function vOnboard(){return `<div class="empty">${ENSO(54)}<h1 class="h2" style="
 <button class="btn" data-a="onboardGo" style="max-width:300px">Let's go</button>
 <button class="link" data-a="why" style="margin-top:18px">Why does it work this way?</button></div>`}
 
+// ---------- gratitude challenge ----------
+const GC_OPTS=[[0,'Off'],[7,'7 days'],[14,'14 days'],[21,'21 days'],[30,'30 days'],[66,'66 days · habit builder'],[90,'90 days'],[-1,'Every day'],['c','Custom…']];
+const gcOn=()=>!!(S.gc&&S.gc.on);
+const gDays=()=>{if(!gcOn())return 0;const st=S.gc.start||'0000';return new Set(S.gratitude.filter(g=>g.date>=st).map(g=>g.date)).size};
+const gToday=()=>S.gratitude.some(g=>g.date===today());
+const gGoal=()=>gcOn()&&S.gc.days>0?S.gc.days:0;
+const gDone=()=>gcOn()&&!!S.gc.done;
+const gHist=()=>S.gcHist||(S.gcHist=[]);
+const MILES=[7,30,100,365];
+const gTotal=()=>new Set(S.gratitude.map(g=>g.date)).size;
+const RING=(f,sz=22)=>{const r=8.5,c=2*Math.PI*r;return `<svg width="${sz}" height="${sz}" viewBox="0 0 22 22"><circle cx="11" cy="11" r="${r}" fill="none" stroke="currentColor" stroke-opacity=".22" stroke-width="2.2"/><circle cx="11" cy="11" r="${r}" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="${(c*f).toFixed(2)} ${c.toFixed(2)}" transform="rotate(-90 11 11)"/><path d="M11 14.6s-3.4-2-3.4-4.2a1.8 1.8 0 0 1 3.4-.8 1.8 1.8 0 0 1 3.4.8c0 2.2-3.4 4.2-3.4 4.2Z" fill="currentColor"/></svg>`};
+function gcBlock(){
+  const on=gcOn(),ed=ui.gcEdit;
+  const head=`<button class="set" data-a="gcToggle"><span><b>Gratitude challenge</b><small>Write one thing you're grateful for each day.</small></span><span class="toggle ${on||ed?'on':''}"><i></i></span></button>`;
+  if(ed){const cur=on?(GC_OPTS.some(o=>o[0]===S.gc.days)?S.gc.days:'c'):30;const sel=ui.gcCustom?'c':cur;
+    return head+`<div style="padding:4px 2px 16px;border-bottom:1px solid var(--line)"><div class="meta" style="font-size:13px;margin:6px 0 0">How long?</div>
+    <select id="gcsel" class="gsel">${GC_OPTS.filter(o=>o[0]!==0).map(([k,l])=>`<option value="${k}" ${sel==k?'selected':''}>${l}</option>`).join('')}</select>
+    ${ui.gcCustom?`<input id="gcnum" class="field" type="number" min="1" max="999" placeholder="Number of days" value="${on&&cur==='c'?S.gc.days:''}" style="margin:6px 0 10px">`:''}
+    <p class="meta" style="margin:6px 0 12px;line-height:1.6;font-size:12.5px">A small rose button on the Pie page keeps track. Your notes go into one Gratitude list shared across all your slices.</p>
+    <div class="two"><button class="btn out" style="flex:1" data-a="gcCancel">Cancel</button><button class="btn" style="flex:1;background:var(--rose)" data-a="gcSave">Save</button></div></div>`}
+  if(on){const g=gGoal(),n=gDays();
+    return head+`<div class="row" style="padding:2px 2px 16px;border-bottom:1px solid var(--line)"><span class="meta" style="margin:0;font-size:13px;color:var(--rose)">${gDone()?`${g}-day challenge · finished 🎉`:`${g?`${g}-day challenge`:'Every day'}`} · ${gDone()?'':` · ${n?`${n} grateful ${n===1?'day':'days'} so far`:'starts today'}`}</span><button class="link" style="font-size:13.5px" data-a="gcEdit">Edit</button></div>`}
+  return head}
+function gPill(){if(gDone())return `<button class="gpill" data-a="gq" aria-label="Gratitude challenge finished">${RING(1)}<span>Done! 🎉</span></button>`;const n=gDays(),g=gGoal(),f=g?Math.min(1,n/g):(gToday()?1:0);
+  return `<button class="gpill" data-a="gq" aria-label="Gratitude challenge">${RING(f)}<span>${gToday()?'✓ ':''}${n?`${n} ${n===1?'day':'days'}`:'Grateful?'}</span></button>`}
+function gratPanel(){const n=gDays(),g=gGoal();
+  return `<div class="side"><div class="pane"><div class="sh"><b>Grateful today</b><button class="icon-btn" style="width:46px;height:46px" data-a="sideclose" aria-label="Close">✕</button></div>
+  <div style="display:flex;align-items:center;gap:12px;color:var(--rose);margin:0 0 16px">${RING(g?Math.min(1,n/g):0,44)}<span style="font-size:14px;font-weight:600">${n?`${n} grateful ${n===1?'day':'days'} so far`:'Your first one starts today'}</span></div>
+  <p class="sub" style="margin-bottom:6px">What's one thing you're grateful for today?</p><textarea id="gtext" class="field" rows="3" placeholder="I'm grateful for…" maxlength="300"></textarea><button class="btn" style="background:var(--rose)" data-a="gqSave">Save</button>
+  <button class="link" style="display:block;margin:16px auto 0;font-size:14px" data-a="gList">See everything you've written</button>
+  </div><div class="shade" data-a="sideclose"></div></div>`}
+function gNextPanel(){const n=gDays();
+  return `<div class="side"><div class="pane"><div class="sh"><b>You did it!</b><button class="icon-btn" style="width:46px;height:46px" data-a="sideclose" aria-label="Close">✕</button></div>
+  <div style="display:flex;align-items:center;gap:12px;color:var(--rose);margin:0 0 14px">${RING(1,44)}<span style="font-size:14px;font-weight:600">${n} grateful days. That's a real habit.</span></div>
+  <p class="sub" style="margin-bottom:14px">What's next? Your notes stay in your Gratitude list either way.</p>
+  <button class="btn" style="background:var(--rose);margin-bottom:10px" data-a="gNextAgain">Start another challenge</button>
+  <button class="btn out" style="margin-bottom:10px" data-a="gNextEvery">Keep going every day</button>
+  <button class="link faint" style="display:block;margin:6px auto 0;font-size:14px" data-a="gNextStop">Stop for now</button>
+  </div><div class="shade" data-a="sideclose"></div></div>`}
+function pinsPanel(){
+  const pins=pinnedList();
+  const row=e=>{const p=pr(e.projectId),s=p&&sl(p.sliceId),t=doneToday(e);
+    return `<div class="card" style="margin-bottom:10px;padding:14px 14px 12px;border-left:5px solid ${s?s.color:'var(--moss)'}"><div class="item-name" style="padding:0">${esc(e.name)}</div>
+    <div class="meta" style="margin:3px 0 10px">${esc(s?s.name:'')} · ${e.repeats?`Log mode${countOf(e.id)?` · ${countOf(e.id)} ${countOf(e.id)===1?'time':'times'}`:''}${t?' · today ✓':''}`:'Do once'}</div>
+    <button class="btn" style="padding:11px;font-size:14px" data-a="did" data-id="${e.id}">${e.repeats?'+ Log it':'✓ I did it'}</button></div>`};
+  return `<div class="side"><div class="pane"><div class="sh"><b>Pinned today</b><button class="icon-btn" style="width:46px;height:46px" data-a="sideclose" aria-label="Close">✕</button></div>
+  ${pins.length?pins.map(row).join(''):'<p class="sub">Nothing pinned right now. Tap the pin on any experiment to keep it here for today.</p>'}
+  </div><div class="shade" data-a="sideclose"></div></div>`}
 function vPie(){
   const n=S.slices.length,C=2*Math.PI*88,slot=C/n,dash=slot*64/79;
   const hr=new Date().getHours(),g=hr<12?'Good Morning!':hr<18?'Good Afternoon!':'Good Evening!';
@@ -278,7 +331,7 @@ function vPie(){
     labels+=`<text class="lbl" data-i="${i}" x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="middle">${esc(s.name.trim().split(/\s+/)[0].toLowerCase())}</text>`;
   });
   const np=pinnedList().length;
-  return `<div class="row" style="margin-bottom:22px;min-height:36px"><span style="display:flex;align-items:center;gap:10px">${ENSO(30)}<b class="serif" style="color:var(--brand);font-size:22px;font-weight:500">Trials</b></span>${np?`<button class="pinpill" data-a="side">${np} pinned today</button>`:''}</div>
+  return `<div class="row" style="margin-bottom:22px;min-height:36px"><span style="display:flex;align-items:center;gap:10px">${ENSO(30)}<b class="serif" style="color:var(--brand);font-size:22px;font-weight:500">Trials</b></span>${gcOn()||np?`<span style="display:flex;gap:8px;align-items:center">${gcOn()?gPill():''}${np?`<button class="pinpill ppill" data-a="pins">${PIN(true)}${np} today</button>`:''}</span>`:''}</div>
   <h1 class="h1" style="font-size:34px">${g}</h1><p class="sub">Inside each slice are your projects. Your projects are hidden in the sidebar menu so you can focus on your experiments.</p>
   <div style="display:flex;justify-content:center;margin:4px 0 14px"><svg viewBox="-26 0 332 280" style="width:100%;max-width:340px">${circles}
   <circle cx="140" cy="140" r="56" fill="var(--washi)" pointer-events="none" style="filter:drop-shadow(0 4px 10px rgba(0,0,0,.16))"/>
@@ -364,7 +417,7 @@ const calHTML=(sel,act)=>{const t=today();const [a,b,c]=t.split('-').map(Number)
   let cells='';for(let i=0;i<28;i++){const d=new Date(st);d.setDate(st.getDate()+i);const iso=isoOf(d);cells+=`<button class="cd ${iso===sel?'s':''}" ${iso>t?'disabled':''} data-a="${act}" data-d="${iso}">${d.getDate()}</button>`}
   return `<div class="cal"><b>M</b><b>T</b><b>W</b><b>T</b><b>F</b><b>S</b><b>S</b>${cells}</div>`};
 
-function vGrat(){return `${back('lab','Lab')}<h1 class="h1" style="font-size:34px;margin:8px 0 16px">Gratitude</h1>
+function vGrat(){return `${v.from==='pie'?back('pie','Pie'):back('lab','Lab')}<h1 class="h1" style="font-size:34px;margin:8px 0 ${gHist().length||gTotal()?'6px':'16px'}">Gratitude</h1>${gHist().length||gTotal()?`<p class="meta" style="margin:0 0 16px;font-size:13.5px;color:var(--rose)">🤍 ${gHist().length?`${gHist().length} ${gHist().length===1?'challenge':'challenges'} finished · `:''}${gTotal()} grateful ${gTotal()===1?'day':'days'} in total</p>`:''}
 ${ui.gadd?`<textarea id="gtext" class="field" rows="3" placeholder="I'm grateful for…" maxlength="300"></textarea><button class="btn" data-a="saveGrat">Save</button><div style="height:14px"></div>`:`<button class="btn dark" data-a="gadd" style="padding:20px;font-size:17px">🤍 What are you grateful for?</button><div style="height:14px"></div>`}
 ${S.gratitude.slice().reverse().map(g=>`<div class="card"><div class="row" style="align-items:flex-start"><div class="serif" style="font-style:italic;font-size:15px;line-height:1.55">${esc(g.text)}</div><button class="icon-btn" style="border:none" data-a="delGrat" data-id="${g.id}">✕</button></div><div class="meta" style="margin-top:6px">${dayLabel(g.date)}</div></div>`).join('')}
 <p class="meta center" style="margin-top:34px;font-size:15px">What's one good thing from today?</p>`}
@@ -378,6 +431,7 @@ return `<h1 class="h1" style="font-size:34px;margin:8px 0 22px">Settings</h1>
 <button class="set" data-a="reveal"><span><b>Hide project names</b><small>Show projects as Project 1, Project 2 and so on, so the big goal behind each one stays out of sight.</small></span><span class="toggle ${S.hideNames?'on':''}"><i></i></span></button>
 ${S.showFinished?`<button class="set" data-a="finAll"><b>Finished projects</b><span class="link">Open</span></button>`:''}
 <button class="set" data-a="customize"><b>Manage your pie</b><span class="link">Open</span></button>
+${gcBlock()}
 ${b?`<div class="card" style="margin-top:14px"><b style="font-weight:500">Restore previous pie</b><p class="sub" style="margin:4px 0 12px;font-size:13px">${days} days left before it's gone for good.</p><div class="actions" style="margin:0"><button class="did" data-a="restore">Restore</button><button class="adj" data-a="delBackup" style="color:var(--red);border-color:var(--red)">Delete now</button></div></div>`:''}
 <div class="sec" style="font-size:14px;margin-top:26px">Your account</div><p class="meta" style="margin:4px 0 14px;line-height:1.6;font-size:13px">Signed in as ${esc(USER?USER.email:'')}. Everything is saved to your account automatically and is private to you.</p>
 <button class="btn out" data-a="signout" style="margin-bottom:6px">Sign out</button>
@@ -407,6 +461,7 @@ function vWhy(){return `<div class="why">${v.from==='onboard'?back('onboard','Ba
 <h3>Why we ask who you're becoming.</h3><p>Every action is evidence of who you're becoming, not proof of how far you have left to go. In Completed, tap “+ Add your identity” under anything you've done and finish the sentence “I'm someone who…” in your own words, or pick a suggestion. Naming it yourself sticks more than anything the app could say for you.</p>
 <h3>Why experiments work two ways.</h3><p>Every card has a small switch. Most things you add are Do once — do it once, tap “I did it,” and it goes straight into Completed. Some things you'll want to keep showing up for. Flip the card to Log mode and it stays put, with a “Log it” button that adds to a quiet count.</p>
 <h3>Finished with a habit?</h3><p>When you're completely done with a Log mode experiment, tap “Edit” on its card, then “Mark done.” The card leaves your lab, and everything you logged stays in Completed. You can bring it back any time.</p>
+<h3>Why gratitude?</h3><p>Research suggests that writing down what you're grateful for, even one small thing a day, trains your attention to notice the good that's already in your life. People who do it tend to feel more optimistic, and in one well-known study, they even made more progress toward their personal goals. Turn on the Gratitude challenge in Settings to try it.</p>
 <h3>Why you can only pin three.</h3><p>Tap the pin on any card to keep it at the top for today. Three is enough to guide a day without turning it into a to-do list. Pins clear themselves tomorrow, so every day starts fresh.</p></div>`}
 
 function sidebar(){
@@ -423,7 +478,8 @@ function sidebar(){
   ${fin.length?`<div class="sgrp">Finished projects</div>${fin.map(x=>`<button class="pinrow" data-a="openFinished" data-id="${x.id}">${esc(dn(x))}</button>`).join('')}`:''}
   </div><div class="shade" data-a="sideclose"></div></div>`}
 
-function sidebarHome(){
+function sidebarHome(){return pinsPanel()}
+function sidebarHomeOld(){
   const pins=pinnedList();
   const groups=S.slices.filter(s=>activeProjects(s.id).length);
   return `<div class="side"><div class="pane"><div class="sh"><b>Trials</b><button class="icon-btn" style="width:46px;height:46px" data-a="sideclose" aria-label="Close">✕</button></div>
@@ -484,7 +540,7 @@ function render(){
   const root=document.getElementById('app');
   const _sp=root.querySelector('.side .pane');const _st=_sp?_sp.scrollTop:0;
   const keepRen=ui.ren?document.getElementById('rn-'+ui.ren.id):null;if(keepRen)ui.ren.val=keepRen.value;
-  root.innerHTML=VIEWS[v.n]()+(ui.side?sidebar():'')+(newp?`<div class="overlay"><div class="modal"><h2 class="h2" style="font-size:25px;line-height:1.25;margin-bottom:12px">What goal is this project for?</h2><p style="margin:2px 0 16px">Write the life goal you want to work toward, like “Make 10k a month” or “Run a half marathon.” It becomes this project's name and stays out of sight once you start, so you can focus on the process.</p><input id="pname" class="field" placeholder="e.g. Make 10k" autocomplete="off" maxlength="80" style="margin-bottom:18px"><div class="two"><button class="btn out" data-a="cancelNew" style="flex:1">Cancel</button><button class="btn" data-a="startProject" style="flex:1">Start</button></div></div></div>`:'')+(modal?`<div class="overlay"><div class="modal"><h2 class="h2" style="font-size:19px">${esc(modal.title)}</h2><p>${esc(modal.body)}</p><div class="two"><button class="btn out" data-a="mno" style="flex:1">Cancel</button><button class="btn ${modal.red?'red':''}" data-a="myes" style="flex:1">${esc(modal.label)}</button></div></div></div>`:'');
+  root.innerHTML=VIEWS[v.n]()+(ui.side?sidebar():'')+(ui.pins?pinsPanel():'')+(ui.gq?gratPanel():'')+(ui.gnext?gNextPanel():'')+(newp?`<div class="overlay"><div class="modal"><h2 class="h2" style="font-size:25px;line-height:1.25;margin-bottom:12px">What goal is this project for?</h2><p style="margin:2px 0 16px">Write the life goal you want to work toward, like “Make 10k a month” or “Run a half marathon.” It becomes this project's name and stays out of sight once you start, so you can focus on the process.</p><input id="pname" class="field" placeholder="e.g. Make 10k" autocomplete="off" maxlength="80" style="margin-bottom:18px"><div class="two"><button class="btn out" data-a="cancelNew" style="flex:1">Cancel</button><button class="btn" data-a="startProject" style="flex:1">Start</button></div></div></div>`:'')+(modal?`<div class="overlay"><div class="modal"><h2 class="h2" style="font-size:19px">${esc(modal.title)}</h2><p>${esc(modal.body)}</p><div class="two"><button class="btn out" data-a="mno" style="flex:1">Cancel</button><button class="btn ${modal.red?'red':''}" data-a="myes" style="flex:1">${esc(modal.label)}</button></div></div></div>`:'');
   if(slide){root.animate([{transform:`translateX(${slide*34}px)`,opacity:.35},{transform:'none',opacity:1}],{duration:220,easing:'ease-out'});slide=0}
   if(flash){flash=false;if(S.flashName&&v.n==='lab'&&pr(v.p)){const d=document.createElement('div');d.className='flash';d.textContent=dn(pr(v.p));document.body.appendChild(d);setTimeout(()=>d.remove(),2200)}}
   const f=root.querySelector('#pname,#ename,#gtext,.inl,textarea');if(f&&!/iPhone|iPad|Android/.test(navigator.userAgent)){f.focus();if(f.setSelectionRange&&f.value)try{f.setSelectionRange(f.value.length,f.value.length)}catch(e){}}
@@ -554,7 +610,29 @@ const A={
   delAll(){ui.menu=false;const p=pr(v.p);mut(()=>{projExps(p.id).forEach(e=>delExp(e.id));return'Removed all experiments'});render()},
   finish(){const p=pr(v.p);mut(()=>{p.status='finished';return'Moved to Finished Projects'});const act=activeProjects(p.sliceId);if(act.length){S.lastProj[p.sliceId]=act[0].id;save();go('lab',{p:act[0].id})}else go('pie')},
   // sidebar
-  side(){ui.side=true;render()},sideclose(){ui.side=false;ui.ren=null;ui.del=null;render()},
+  side(){ui.side=true;render()},pins(){ui.pins=true;render()},
+  gq(){if(gDone()){ui.gnext=true;render();return}if(gToday()){go('grat',{from:'pie'});return}ui.gq=true;render()},
+  gNextAgain(){S.gc={on:false};save();ui.gnext=false;go('settings');ui.gcEdit=true;render();setTimeout(()=>{const e=document.querySelector('[data-a=gcToggle]');e&&e.scrollIntoView({block:'center'})},50)},
+  gNextEvery(){S.gc={on:true,days:-1,start:S.gc.start};save();ui.gnext=false;render();toast('Every day. Keep going 🤍')},
+  gNextStop(){S.gc={on:false};save();ui.gnext=false;render();toast('Challenge stopped. Your notes are saved.')},
+  gList(){ui.gq=false;go('grat',{from:'pie'})},
+  gqSave(){const t=val('gtext');if(!t)return;const before=gDays();S.gratitude.push({id:uid(),text:t,date:today()});save();ui.gq=false;render();
+    const n=gDays(),g=gGoal();let msg;
+    if(n===before)msg='Saved to Gratitude';
+    else if(g&&n>=g){S.gc.done=true;gHist().push({days:g,date:today()});save();render();msg=`You did it! ${n} grateful days 🤍`}
+    else if(!g&&MILES.includes(n)){gHist().push({days:n,date:today(),every:true});save();msg=`${n} grateful days! 🤍`}
+    else msg=n===1?'First one. Nice start.':g&&n===Math.ceil(g/2)?'Halfway there. Keep going.':`${n} grateful days`;
+    toast(msg)},
+  gcToggle(){if(ui.gcEdit){ui.gcEdit=false;ui.gcCustom=false;render();return}if(gcOn()){S.gc={on:false};save();render();toast('Challenge off');return}ui.gcEdit=true;render()},
+  gcEdit(){ui.gcEdit=true;ui.gcCustom=gcOn()&&!GC_OPTS.some(o=>o[0]===S.gc.days);render()},
+  gcCancel(){ui.gcEdit=false;ui.gcCustom=false;render()},
+  gcSave(){let x=document.getElementById('gcsel').value;if(x==='c'){x=parseInt(val('gcnum'),10);if(!(x>0&&x<=999))return toast('Enter a number of days')}else x=+x;
+    const same=gcOn()&&S.gc.days===x;S.gc={on:true,days:x,start:same?S.gc.start:(gcOn()?S.gc.start:today())};ui.gcEdit=false;ui.gcCustom=false;save();render();toast(x>0?`${x}-day challenge`:'Every day')},
+  gcSet(d){const el=document.getElementById('gcsel');let x=el?el.value:'0';if(x==='c'){ui.gcCustom=true;render();return}ui.gcCustom=false;x=+x;
+    if(!x){S.gc={on:false};save();render();toast('Challenge off');return}
+    S.gc={on:true,days:x,start:today()};save();render();toast(x>0?`${x}-day challenge started`:'Every day. Started.')},
+  gcCustomGo(){const x=parseInt(val('gcnum'),10);if(!(x>0&&x<=999))return toast('Enter a number of days');ui.gcCustom=false;S.gc={on:true,days:x,start:today()};save();render();toast(`${x}-day challenge started`)},
+  sideclose(){ui.side=false;ui.pins=false;ui.gq=false;ui.gnext=false;ui.ren=null;ui.del=null;render()},
   pgo(d){setProj(d.id);go('lab',{p:d.id})},
   renStart(d){ui.del=null;ui.ren={id:d.id,val:pr(d.id).name};render()},
   renSave(){const r=ui.ren;if(!r)return;const n=val('rn-'+r.id);if(n){pr(r.id).name=n;save()}ui.ren=null;render()},
@@ -607,6 +685,7 @@ document.addEventListener('click',ev=>{
   if(ui.menu&&el.dataset.a!=='menu'&&!el.closest('.menu')){ui.menu=false}
   const f=A[el.dataset.a];if(f)f(el.dataset);
 });
+document.addEventListener('change',ev=>{if(ev.target.id==='gcsel'){const c=ev.target.value==='c';if(c!==!!ui.gcCustom){ui.gcCustom=c;render()}}});
 document.addEventListener('input',ev=>{const t=ev.target;
   if(t.dataset&&t.dataset.a==='rename'){sl(t.dataset.id).name=t.value||'Slice';save()}
   else if(t.id&&t.id.startsWith('idt-'))ui.idv=t.value;
