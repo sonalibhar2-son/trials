@@ -300,7 +300,8 @@ function gPill(){if(gDone())return `<button class="gpill" data-a="gq" aria-label
 function gratPanel(){const n=gDays(),g=gGoal();
   return `<div class="side"><div class="pane"><div class="sh"><b>Grateful today</b><button class="icon-btn" style="width:46px;height:46px" data-a="sideclose" aria-label="Close">✕</button></div>
   <div style="display:flex;align-items:center;gap:12px;color:var(--rose);margin:0 0 16px">${RING(g?Math.min(1,n/g):0,44)}<span style="font-size:14px;font-weight:600">${n?`${n} grateful ${n===1?'day':'days'} so far`:'Your first one starts today'}</span></div>
-  <p class="sub" style="margin-bottom:6px">What's one thing you're grateful for today?</p><textarea id="gtext" class="field" rows="3" placeholder="I'm grateful for…" maxlength="300"></textarea><button class="btn" style="background:var(--rose)" data-a="gqSave">Save</button>
+  <p class="sub" style="margin-bottom:6px">${new Date().getHours()>=17?"Look back on today. What's one good thing?":"What's one thing you're grateful for today?"}</p><textarea id="gtext" class="field" rows="3" placeholder="I'm grateful for…" maxlength="300" style="margin-bottom:8px"></textarea>
+  <input id="gwhy" class="field" placeholder="Why was it good? (optional)" maxlength="300" style="padding:11px 14px;font-size:14px;margin:0 0 16px"><button class="btn" style="background:var(--rose)" data-a="gqSave">Save</button>
   <button class="link" style="display:block;margin:16px auto 0;font-size:14px" data-a="gList">See everything you've written</button>
   </div><div class="shade" data-a="sideclose"></div></div>`}
 function gNextPanel(){const n=gDays();
@@ -419,7 +420,7 @@ const calHTML=(sel,act)=>{const t=today();const [a,b,c]=t.split('-').map(Number)
 
 function vGrat(){return `${v.from==='pie'?back('pie','Pie'):back('lab','Lab')}<h1 class="h1" style="font-size:34px;margin:8px 0 ${gHist().length||gTotal()?'6px':'16px'}">Gratitude</h1>${gHist().length||gTotal()?`<p class="meta" style="margin:0 0 16px;font-size:13.5px;color:var(--rose)">🤍 ${gHist().length?`${gHist().length} ${gHist().length===1?'challenge':'challenges'} finished · `:''}${gTotal()} grateful ${gTotal()===1?'day':'days'} in total</p>`:''}
 ${ui.gadd?`<textarea id="gtext" class="field" rows="3" placeholder="I'm grateful for…" maxlength="300"></textarea><button class="btn" data-a="saveGrat">Save</button><div style="height:14px"></div>`:`<button class="btn dark" data-a="gadd" style="padding:20px;font-size:17px">🤍 What are you grateful for?</button><div style="height:14px"></div>`}
-${S.gratitude.slice().reverse().map(g=>`<div class="card"><div class="row" style="align-items:flex-start"><div class="serif" style="font-style:italic;font-size:15px;line-height:1.55">${esc(g.text)}</div><button class="icon-btn" style="border:none" data-a="delGrat" data-id="${g.id}">✕</button></div><div class="meta" style="margin-top:6px">${dayLabel(g.date)}</div></div>`).join('')}
+${S.gratitude.slice().reverse().map(g=>`<div class="card"><div class="row" style="align-items:flex-start"><div><div class="serif" style="font-style:italic;font-size:15px;line-height:1.55">${esc(g.text)}</div>${g.why?`<div class="meta" style="margin-top:4px;font-size:13px;line-height:1.5">Why: ${esc(g.why)}</div>`:''}</div><button class="icon-btn" style="border:none" data-a="delGrat" data-id="${g.id}">✕</button></div><div class="meta" style="margin-top:6px">${dayLabel(g.date)}</div></div>`).join('')}
 <p class="meta center" style="margin-top:34px;font-size:15px">What's one good thing from today?</p>`}
 
 function vSettings(){const b=S.backup;const days=b?Math.max(1,Math.ceil((b.expiresAt-Date.now())/864e5)):0;
@@ -616,7 +617,7 @@ const A={
   gNextEvery(){S.gc={on:true,days:-1,start:S.gc.start};save();ui.gnext=false;render();toast('Every day. Keep going 🤍')},
   gNextStop(){S.gc={on:false};save();ui.gnext=false;render();toast('Challenge stopped. Your notes are saved.')},
   gList(){ui.gq=false;go('grat',{from:'pie'})},
-  gqSave(){const t=val('gtext');if(!t)return;const before=gDays();S.gratitude.push({id:uid(),text:t,date:today()});save();ui.gq=false;render();
+  gqSave(){const t=val('gtext');if(!t)return;const w=val('gwhy');const before=gDays();S.gratitude.push(Object.assign({id:uid(),text:t,date:today()},w?{why:w}:{}));save();ui.gq=false;render();
     const n=gDays(),g=gGoal();let msg;
     if(n===before)msg='Saved to Gratitude';
     else if(g&&n>=g){S.gc.done=true;gHist().push({days:g,date:today()});save();render();msg=`You did it! ${n} grateful days 🤍`}
