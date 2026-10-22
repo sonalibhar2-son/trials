@@ -197,6 +197,15 @@ input,textarea{font:inherit;color:var(--ink)}
 .grp.open .grph .chev{transform:rotate(180deg)}
 .grpb{padding:0 14px 6px;border-top:1px solid color-mix(in srgb,var(--edge) 30%,var(--stone));--line:color-mix(in srgb,var(--edge) 24%,var(--stone))}
 .grpb .set2:last-child,.grpb .set:last-child{border-bottom:none}
+/* tuck list */
+.tuckb{font-size:13px;font-weight:600;color:var(--moss);padding:6px 4px}
+.tlist{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.trow{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--stone);border-radius:16px;padding:14px 16px;box-shadow:var(--shadow-card)}
+.trow .ti{font-weight:700;width:16px;text-align:center;flex-shrink:0}
+.trow .tn{flex:1;min-width:0;font-family:'Zen Old Mincho',serif;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.trow .tt{font-size:12px;color:var(--moss);font-weight:600;flex-shrink:0}
+.trow .tc{font-size:12px;color:var(--ink-faint);flex-shrink:0}
+.topen .card{margin-bottom:6px}
 /* footer */
 #foot{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--washi);border-top:1px solid var(--line);padding:9px 0 calc(9px + env(safe-area-inset-bottom))}
 #foot .in{max-width:520px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr)}
@@ -466,7 +475,9 @@ function vLab(){
     body=exps.map(e=>`<button class="list-row" data-a="selExp" data-id="${e.id}" style="width:100%;text-align:left"><span class="box ${sel.has(e.id)?'on':''}">${sel.has(e.id)?'✓':''}</span><span class="nm">${esc(e.name)}</span></button>`).join('')+
     `<div class="grow"></div><button class="btn red" ${sel.size?'':'disabled'} data-a="delSelExp">Delete ${sel.size} selected</button><button class="link faint center" style="padding:14px" data-a="cancelSel">Cancel</button>`;
   }else{
-    body=exps.map(e=>card(e,col)).join('')+'<div class="grow"></div>';
+    const tk=!!S.tucked&&exps.length>1;
+    const bar=exps.length>1?`<div class="row" style="justify-content:space-between;margin:0 2px 10px"><span class="meta" style="margin:0;font-size:12.5px">${exps.length} experiments</span><button class="tuckb" data-a="tuckAll">${tk?'Show all':'Tuck all'} <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(${tk?0:180}deg);vertical-align:-2px"><path d="m6 9 6 6 6-6"/></svg></button></div>`:'';
+    body=bar+(tk?`<div class="tlist">${exps.map(e=>ui.openExp===e.id?`<div class="topen">${card(e,col)}<button class="link faint" style="font-size:12.5px;display:block;margin:-4px auto 10px" data-a="openExp" data-id="${e.id}">Fold up</button></div>`:`<button class="trow" data-a="openExp" data-id="${e.id}"><span class="ti" style="color:${col}">${e.repeats?'↻':'✓'}</span><span class="tn">${esc(e.name)}</span>${isPinned(e)?`<span style="color:var(--ink-faint)">${PIN(true)}</span>`:''}${e.repeats?(()=>{const c=countOf(e.id),w=`${c} ${c===1?'time':'times'}`;return doneToday(e)?`<span class="tt">✓ today · ${w}</span>`:c?`<span class="tc">shown up ${w}</span>`:''})():''}<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--ink-faint);flex-shrink:0"><path d="m6 9 6 6 6-6"/></svg></button>`).join('')}</div>`:exps.map(e=>card(e,col)).join(''))+'<div class="grow"></div>';
   }
   const menu=ui.menu?`<div class="menu"><div class="mh">${esc(dn(p))}</div><hr><button data-a="selMode">Select experiments to delete</button><button data-a="delAll" style="color:var(--red)">Delete all experiments</button><hr><button data-a="finish">Mark project as finished</button></div>`:'';
   const tip=S.tipHidden?`<button class="tipshow" data-a="tipShow"><span style="color:var(--ink-faint)">${BARS}</span>Show tip: where is my project?</button>`:
@@ -752,6 +763,8 @@ const A={
   rDel(){const id=v.r;ask('Delete this page?','It will be removed from your journal.','Delete',()=>{S.reflections=refls().filter(r=>r.id!==id);go('journal',{jt:'r'})})},
   grpTog(d){const cur=document.querySelector(`[data-a=grpTog][data-k=${d.k}]`).getAttribute('aria-expanded')==='true';ui.open=Object.assign({},ui.open,{[d.k]:!cur});render()},
   wq(d){ui.wq=ui.wq===d.k?null:d.k;render()},
+  tuckAll(){S.tucked=!S.tucked;ui.openExp=null;save();render()},
+  openExp(d){ui.openExp=ui.openExp===d.id?null:d.id;render()},
   info(d){ui.info=ui.info===d.k?null:d.k;render()},
   gList(){ui.gq=false;go('journal',{jt:'g',from:'pie'})},
   gqSave(){const t=val('gtext');if(!t)return;const w=val('gwhy');const before=gDays();S.gratitude.push(Object.assign({id:uid(),text:t,date:today()},w?{why:w}:{}));save();ui.gq=false;render();
