@@ -12,9 +12,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Zen+Old+Mincho:wght@400;500;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-:root{--sky:#3F657A;--sky-bg:#E3ECF0;--rose:#96525F;--rose-bg:#F3E4E6;--washi:#FBF8F1;--stone:#F1ECDD;--card:#fff;--ink:#2A2A28;--on-ink:#fff;--ink-soft:#6E6B63;--ink-faint:#9F9A8E;--line:#E1DCCF;--moss:#2C4A34;--on-moss:#fff;--brand:#2C4A34;--clay:#A8763A;--red:#A5483D;
+:root{--edge:#7A5536;--paper:#FFFCF5;--sky:#3F657A;--sky-bg:#E3ECF0;--rose:#96525F;--rose-bg:#F3E4E6;--washi:#FBF8F1;--stone:#F1ECDD;--card:#fff;--ink:#2A2A28;--on-ink:#fff;--ink-soft:#6E6B63;--ink-faint:#9F9A8E;--line:#E1DCCF;--moss:#2C4A34;--on-moss:#fff;--brand:#2C4A34;--clay:#A8763A;--red:#A5483D;
 --r-lg:20px;--r-md:14px;--r-pill:22px;--shadow-card:0 10px 22px -12px rgba(42,42,40,.2);--shadow-accent:0 10px 22px -10px rgba(44,74,52,.24);--scrim:rgba(42,42,40,.38)}
-:root[data-theme=dark]{--sky:#9CC3D6;--sky-bg:#26323A;--rose:#E2A4B0;--rose-bg:#3A2A2D;--washi:#1D1C19;--stone:#2A2925;--card:#33322D;--ink:#EDE8DB;--on-ink:#1D1C19;--ink-soft:#B6B1A3;--ink-faint:#8A8676;--line:#3D3B34;--moss:#8DB89A;--on-moss:#1D1C19;--brand:#8DB89A;--clay:#D2A064;--red:#D9776A;--shadow-card:0 10px 22px -12px rgba(0,0,0,.6);--shadow-accent:0 10px 22px -10px rgba(0,0,0,.6);--scrim:rgba(0,0,0,.55)}
+:root[data-theme=dark]{--edge:#C29C76;--paper:#2C2B27;--sky:#9CC3D6;--sky-bg:#26323A;--rose:#E2A4B0;--rose-bg:#3A2A2D;--washi:#1D1C19;--stone:#2A2925;--card:#33322D;--ink:#EDE8DB;--on-ink:#1D1C19;--ink-soft:#B6B1A3;--ink-faint:#8A8676;--line:#3D3B34;--moss:#8DB89A;--on-moss:#1D1C19;--brand:#8DB89A;--clay:#D2A064;--red:#D9776A;--shadow-card:0 10px 22px -12px rgba(0,0,0,.6);--shadow-accent:0 10px 22px -10px rgba(0,0,0,.6);--scrim:rgba(0,0,0,.55)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--washi)}
 body{font-family:'Zen Kaku Gothic New',sans-serif;color:var(--ink);display:flex;justify-content:center}
@@ -175,6 +175,28 @@ input,textarea{font:inherit;color:var(--ink)}
 .nbrow{display:block;width:100%;text-align:left;background:var(--card);border-radius:16px;padding:14px 16px;margin-bottom:10px;border:1px solid var(--line)}
 .nbrow .d{font-size:13px;font-weight:600;color:var(--sky)}
 .nbrow .t{font-family:'Zen Old Mincho',serif;font-size:15px;color:var(--ink-soft);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* settings layout */
+.shd{font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);font-weight:700;margin:28px 2px 2px}
+.set2{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding:14px 2px;border-bottom:1px solid var(--line)}
+.set2 .tt{flex:1;min-width:0}
+.set2 b{font-weight:500;font-size:15.5px}
+.set2 small{display:block;font-size:12.5px;color:var(--ink-faint);margin-top:3px;line-height:1.5}
+.info{display:inline-flex;width:19px;height:19px;border-radius:50%;border:1.3px solid var(--ink-faint);color:var(--ink-faint);font-size:11px;font-weight:700;font-family:Georgia,serif;font-style:italic;align-items:center;justify-content:center;margin-left:7px;vertical-align:2px}
+.info.on{background:var(--ink-faint);color:var(--washi)}
+.more{font-size:12.5px;color:var(--ink-soft);line-height:1.6;margin-top:8px;background:var(--stone);border-radius:10px;padding:10px 12px}
+.set2 .toggle{margin-top:3px}
+/* collapsible sections */
+.grp{border:1px solid color-mix(in srgb,var(--edge) 38%,var(--line));border-radius:18px;margin-top:14px;background:var(--paper);overflow:hidden;transition:border-color .2s}
+.grp.open{border-color:color-mix(in srgb,var(--edge) 70%,var(--line))}
+.gi{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--c);background:color-mix(in srgb,var(--c) 13%,transparent)}
+.grph .gt{display:flex;align-items:center;gap:12px}
+.grph{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;text-align:left;padding:16px 16px}
+.grph b{font-weight:600;font-size:16px;display:block}
+.grph small{display:block;font-size:12.5px;color:var(--ink-faint);margin-top:3px}
+.grph .chev{transition:transform .2s;color:var(--ink-faint);flex-shrink:0}
+.grp.open .grph .chev{transform:rotate(180deg)}
+.grpb{padding:0 14px 6px;border-top:1px solid color-mix(in srgb,var(--edge) 30%,var(--stone));--line:color-mix(in srgb,var(--edge) 24%,var(--stone))}
+.grpb .set2:last-child,.grpb .set:last-child{border-bottom:none}
 /* footer */
 #foot{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--washi);border-top:1px solid var(--line);padding:9px 0 calc(9px + env(safe-area-inset-bottom))}
 #foot .in{max-width:520px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr)}
@@ -300,7 +322,7 @@ function rfSince(){const st=S.rf&&S.rf.last||'0000';const ens=S.entries.filter(e
 const rfSel=()=>ui.rfSel||(rfOn()?S.rf.every:7);
 function rfBlock(){
   const on=rfOn(),ed=ui.rfEdit;
-  const head=`<button class="set" data-a="rfToggle"><span><b>Active reflection</b><small>Every few days, take a walk and look back on your experiments.</small></span><span class="toggle ${on||ed?'on':''}"><i></i></span></button>`;
+  const head=setRow('rf','Active reflection','A walk and a few lines, every few days.',`Pick how often. On reflection day, a card on the Pie page invites you to take a walk, or any gentle movement, then write freely. You can move it, skip it or tuck it away. Everything you write goes into your Journal, shared across all your slices. You’ll find it at the bottom of any experiment page. ${jOn()?'<button class="link" style="font-size:12.5px" data-a="notebook">Open Journal</button>':''}`,on||ed,'rfToggle');
   if(ed){const se=rfSel(),opts=RF_EVERY.filter(o=>o[0]!=='c').map(o=>o[0]),cv=ui.rfCV,isC=!opts.includes(se);
     const first=ui.rfStart?(ui.rfStart===today()?'today':new Date(...ui.rfStart.split('-').map((x,i)=>i===1?x-1:+x)).toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'})):(()=>{const base=on?S.rf.last:today(),d=dDiff(today(),isoAdd(base,se));return d<=0?'today':d===1?'tomorrow':`in ${d} days`})();
     return head+`<div style="padding:4px 2px 16px;border-bottom:1px solid var(--line)">
@@ -309,7 +331,7 @@ function rfBlock(){
       :`<select id="rfE" class="gsel">${opts.map(k=>`<option value="${k}" ${se===k?'selected':''}>${k} days</option>`).join('')}${cv?`<option value="cv" ${isC?'selected':''}>${cv} ${cv===1?'day':'days'} (custom)</option><option value="c">Edit custom</option>`:`<option value="c">Custom…</option>`}</select>`}
     ${`<div class="meta" style="font-size:13px;margin:10px 0 0">${on?'Next reflection':'First reflection'}: <b id="rfFirst" style="color:var(--sky);font-weight:600">${first}</b></div>
     ${ui.rfStart?`<button class="link" style="font-size:13.5px;margin:4px 16px 0 0" data-a="rfStartClear">Use default</button>`:''}<span style="position:relative;display:inline-block"><button class="link" style="font-size:13.5px;margin-top:4px" data-a="pickDate" data-for="rfStartDay">${ui.rfStart?'pick another day':on?'or choose a day':'or choose a start day'}</button><input id="rfStartDay" type="date" min="${today()}" tabindex="-1" aria-hidden="true" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;border:0;padding:0"></span>`}
-    <p class="meta" style="margin:6px 0 12px;line-height:1.6;font-size:12.5px">On reflection day, a card on the Pie page invites you to take a walk, or any gentle movement, then write freely in your Journal. You can always move it to another day.</p>
+    <div style="height:12px"></div>
     <div class="two"><button class="btn out" style="flex:1" data-a="rfCancel">Cancel</button><button class="btn" style="flex:1;background:var(--sky)" data-a="rfSave">Save</button></div></div>`}
   if(on)return head+`<div style="padding:2px 2px 16px;border-bottom:1px solid var(--line)"><div class="row"><span class="meta" style="margin:0;font-size:13px;color:var(--sky)">Every ${S.rf.every} ${S.rf.every===1?'day':'days'}</span><button class="link" style="font-size:13.5px" data-a="rfEdit">Edit</button></div>
     <div class="row" style="margin-top:6px"><span class="meta" style="margin:0;font-size:13px">Next reflection: ${rfWhen().replace(/^on /,'')}</span></div></div>`;
@@ -361,12 +383,12 @@ const RING=(f,sz=22)=>{const r=8.5,c=2*Math.PI*r;return `<svg width="${sz}" heig
 const gcSelV=()=>ui.gcSel??(gcOn()?S.gc.days:30);
 function gcBlock(){
   const on=gcOn(),ed=ui.gcEdit;
-  const head=`<button class="set" data-a="gcToggle"><span><b>Gratitude challenge</b><small>Write one thing you're grateful for each day.</small></span><span class="toggle ${on||ed?'on':''}"><i></i></span></button>`;
+  const head=setRow('gc','Gratitude challenge','One good thing a day.',`Pick how many days. A small rose button on the Pie page lets you write and shows your progress. Missing a day never resets your count. Everything you write goes into your Journal, shared across all your slices. You’ll find it at the bottom of any experiment page. ${jOn()?'<button class="link" style="font-size:12.5px" data-a="notebook">Open Journal</button>':''}`,on||ed,'gcToggle');
   if(ed){const se=gcSelV(),pre=GC_OPTS.filter(o=>o[0]!==0&&o[0]!=='c'),cv=ui.gcCV,isC=!pre.some(o=>o[0]===se);
     return head+`<div style="padding:4px 2px 16px;border-bottom:1px solid var(--line)"><div class="meta" style="font-size:13px;margin:6px 0 0">How long?</div>
     ${ui.gcCE?`<div class="row" style="justify-content:flex-start;gap:10px;margin:8px 0 6px"><input id="gcnum" class="field" type="number" inputmode="numeric" min="1" max="999" placeholder="e.g. 45" value="${cv||''}" style="margin:0;width:110px"><span style="font-size:15px">days</span><button class="btn" style="width:auto;padding:10px 18px;font-size:14px;background:var(--rose)" data-a="gcNSet">Save</button></div><div class="row" style="justify-content:flex-start;gap:18px"><button class="link faint" style="font-size:13px" data-a="gcNBack">Back to the list</button>${cv?`<button class="link" style="font-size:13px;color:var(--red)" data-a="gcNRemove">Remove ${cv} days</button>`:''}</div>`
       :`<select id="gcsel" class="gsel">${pre.map(([k,l])=>`<option value="${k}" ${se===k?'selected':''}>${l}</option>`).join('')}${cv?`<option value="cv" ${isC?'selected':''}>${cv} days (custom)</option><option value="c">Edit custom</option>`:`<option value="c">Custom…</option>`}</select>`}
-    <p class="meta" style="margin:6px 0 12px;line-height:1.6;font-size:12.5px">A small rose button on the Pie page keeps track. Your notes go into one Gratitude list shared across all your slices.</p>
+    <div style="height:12px"></div>
     <div class="two"><button class="btn out" style="flex:1" data-a="gcCancel">Cancel</button><button class="btn" style="flex:1;background:var(--rose)" data-a="gcSave">Save</button></div></div>`}
   if(on){const g=gGoal(),n=gDays();
     return head+`<div class="row" style="padding:2px 2px 16px;border-bottom:1px solid var(--line)"><span class="meta" style="margin:0;font-size:13px;color:var(--rose)">${gDone()?`${g}-day challenge · finished 🎉`:`${g?`${g}-day challenge`:'Every day'}`}${gDone()?'':` · ${n?`${n} grateful ${n===1?'day':'days'} so far`:'starts today'}`}</span><button class="link" style="font-size:13.5px" data-a="gcEdit">Edit</button></div>`}
@@ -499,21 +521,27 @@ ${ui.gadd?`<textarea id="gtext" class="field" rows="3" placeholder="I'm grateful
 ${S.gratitude.slice().reverse().map(g=>ui.gedit===g.id?`<div class="card"><textarea id="ge-t" class="field" rows="3" maxlength="300" style="margin:0 0 8px">${esc(g.text)}</textarea><input id="ge-w" class="field" placeholder="Why was it good? (optional)" maxlength="300" value="${esc(g.why||'')}" style="padding:11px 14px;font-size:14px;margin:0 0 12px"><div class="two"><button class="btn out" style="flex:1;padding:11px" data-a="gEditNo">Cancel</button><button class="btn" style="flex:1;padding:11px" data-a="gEditSave" data-id="${g.id}">Save</button></div><div class="meta" style="margin-top:8px">${dayLabel(g.date)}</div></div>`:`<div class="card"><div class="row" style="align-items:flex-start"><div><div class="serif" style="font-style:italic;font-size:15px;line-height:1.55">${esc(g.text)}</div>${g.why?`<div class="meta" style="margin-top:4px;font-size:13px;line-height:1.5">Why: ${esc(g.why)}</div>`:''}</div><span class="row" style="gap:0;flex-shrink:0"><button class="icon-btn" style="border:none" data-a="gEdit" data-id="${g.id}" aria-label="Edit">${PENCIL}</button><button class="icon-btn" style="border:none" data-a="delGrat" data-id="${g.id}" aria-label="Delete">✕</button></span></div><div class="meta" style="margin-top:6px">${dayLabel(g.date)}</div></div>`).join('')}
 <p class="meta center" style="margin-top:34px;font-size:15px">What's one good thing from today?</p>`}
 
+const TOPBAR=()=>`<div class="row" style="margin-bottom:18px;min-height:36px"><span style="display:flex;align-items:center;gap:10px">${ENSO(30)}<b class="serif" style="color:var(--brand);font-size:22px;font-weight:500">Trials</b></span></div>`;
+const GICON={pie:'<circle cx="12" cy="12" r="8.5"/><path d="M12 3.5V12l6 6"/>',spark:'<path d="M11 3.5l1.8 5.2 5.2 1.8-5.2 1.8L11 17.5l-1.8-5.2L4 10.5l5.2-1.8Z"/><path d="M18.5 15.5v5M16 18h5"/>',user:'<circle cx="12" cy="8.5" r="3.6"/><path d="M5 20c1-3.8 4-5.6 7-5.6s6 1.8 7 5.6"/>',sprout:'<path d="M12 21v-8.5"/><path d="M12 12.5C12 8.6 9 6 5 6c0 3.9 3 6.5 7 6.5Z"/><path d="M12 10.5c0-3.3 2.4-5.6 6.5-5.6 0 3.3-2.4 5.6-6.5 5.6Z"/>',tube:'<path d="M9 3.5h6M10 3.5v13.5a2 2 0 0 0 4 0V3.5"/><path d="M10 12.5h4"/>',heart:'<path d="M12 19.5s-7-4.3-7-9.3A3.8 3.8 0 0 1 12 8.2a3.8 3.8 0 0 1 7 2c0 5-7 9.3-7 9.3Z"/>'};
+function grp(k,title,sub,body,ic,col){const M={proj:['pie','var(--moss)'],feat:['spark','var(--clay)'],acct:['user','var(--ink-soft)'],w_idea:['sprout','var(--moss)'],w_exp:['tube','var(--clay)'],w_gr:['heart','var(--rose)']};if(!ic&&M[k]){ic=M[k][0];col=M[k][1]}const o=(ui.open&&ui.open[k]!==undefined)?ui.open[k]:(k==='feat'&&(ui.gcEdit||ui.rfEdit));
+  return `<div class="grp ${o?'open':''}"><button class="grph" data-a="grpTog" data-k="${k}" aria-expanded="${o?'true':'false'}"><span class="gt">${ic?`<span class="gi" style="--c:${col}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${GICON[ic]}</svg></span>`:''}<span><b>${title}</b><small>${sub}</small></span></span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button>${o?`<div class="grpb">${body}</div>`:''}</div>`}
+function setRow(k,title,short,more,on,act){const o=ui.info===k;
+  return `<div class="set2"><div class="tt"><b>${title}</b>${more?`<button class="info ${o?'on':''}" data-a="info" data-k="${k}" aria-label="More about ${title}">i</button>`:''}<small>${short}</small>${o?`<div class="more">${more}</div>`:''}</div><button class="toggle ${on?'on':''}" data-a="${act}" aria-label="${title}"><i></i></button></div>`}
 function vSettings(){const b=S.backup;const days=b?Math.max(1,Math.ceil((b.expiresAt-Date.now())/864e5)):0;
 const th=(k,l)=>`<button class="${S.theme===k?'on':''}" data-a="theme" data-k="${k}">${l}</button>`;
-return `<h1 class="h1" style="font-size:34px;margin:8px 0 22px">Settings</h1>
-<div style="font-size:16px;font-weight:500">Appearance</div><div class="segc">${th('light','Light')}${th('dark','Dark')}${th('auto','Match device')}</div>
-<button class="set" style="border-top:1px solid var(--line)" data-a="togFin"><span><b>Show Finished Projects</b><small>Controls both the full list and whether finished projects appear in each slice's sidebar. Off by default.</small></span><span class="toggle ${S.showFinished?'on':''}"><i></i></span></button>
-<button class="set" data-a="togFlash"><span><b>Show project name when switching</b><small>A quick flash of the project's name when you swipe or tap the arrows, so you know where you landed. Turn off to keep names fully hidden.</small></span><span class="toggle ${S.flashName?'on':''}"><i></i></span></button>
-<button class="set" data-a="reveal"><span><b>Hide project names</b><small>Show projects as Project 1, Project 2 and so on, so the big goal behind each one stays out of sight.</small></span><span class="toggle ${S.hideNames?'on':''}"><i></i></span></button>
+return `${TOPBAR()}<h1 class="h1" style="font-size:30px;margin:0 0 18px">Settings</h1>
+<div class="gt" style="display:flex;align-items:center;gap:12px;padding:0 2px;margin:4px 0 10px"><span class="gi" style="--c:var(--sky)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16Z" fill="currentColor"/></svg></span><b style="font-weight:600;font-size:16px">Appearance</b></div><div class="segc" style="margin-top:0">${th('light','Light')}${th('dark','Dark')}${th('auto','Match device')}</div>
+${grp('proj','Projects','Finished projects, names and your pie',`${setRow('fin','Show finished projects','See projects you’ve finished.','Shows the full list of finished projects here in Settings, and lists them in each slice’s sidebar. Off by default.',S.showFinished,'togFin')}
+${setRow('flash','Show name when switching','A quick flash of the project’s name.','When you swipe or tap the arrows between projects, the name flashes for a moment so you know where you landed. Turn it off to keep names fully hidden.',S.flashName,'togFlash')}
+${setRow('hide','Hide project names','Show them as Project 1, 2, 3…','Your projects are named after big goals. Hiding the names keeps those goals out of sight so you can focus on the next small step.',S.hideNames,'reveal')}
 ${S.showFinished?`<button class="set" data-a="finAll"><b>Finished projects</b><span class="link">Open</span></button>`:''}
-<button class="set" data-a="customize"><b>Manage your pie</b><span class="link">Open</span></button>
-${gcBlock()}${rfBlock()}${jOn()?`<p class="meta" style="margin:10px 2px 0;line-height:1.6;font-size:12.5px">Your Journal (Gratitude and Reflections) is shared across all your slices. You'll find it at the bottom of any experiment page. <button class="link" style="font-size:12.5px" data-a="notebook">Open Journal</button></p>`:''}
+<button class="set" data-a="customize"><b>Manage your pie</b><span class="link">Open</span></button>`)}
+${grp('feat','Features',[gcOn()?'Gratitude on':'',rfOn()?'Reflection on':''].filter(Boolean).join(' · ')||'Gratitude and reflection',gcBlock()+rfBlock())}
 ${b?`<div class="card" style="margin-top:14px"><b style="font-weight:500">Restore previous pie</b><p class="sub" style="margin:4px 0 12px;font-size:13px">${days} days left before it's gone for good.</p><div class="actions" style="margin:0"><button class="did" data-a="restore">Restore</button><button class="adj" data-a="delBackup" style="color:var(--red);border-color:var(--red)">Delete now</button></div></div>`:''}
-<div class="sec" style="font-size:14px;margin-top:26px">Your account</div><p class="meta" style="margin:4px 0 14px;line-height:1.6;font-size:13px">Signed in as ${esc(USER?USER.email:'')}. Everything is saved to your account automatically and is private to you.</p>
-<button class="btn out" data-a="signout" style="margin-bottom:6px">Sign out</button>
-<div class="sec" style="font-size:14px;margin-top:26px">Your data</div><p class="meta" style="margin:4px 0 14px;line-height:1.6;font-size:13px">You can also download a copy of everything as a file.</p>
-<div class="actions" style="margin:0"><button class="btn out" data-a="export">Download backup</button><label class="btn out" style="cursor:pointer">Restore from file<input type="file" id="imp" accept=".json,application/json" style="display:none"></label></div>`}
+${grp('acct','Account',esc(USER?USER.email:''),`<p class="meta" style="margin:14px 2px 12px;line-height:1.6;font-size:13px">Signed in as ${esc(USER?USER.email:'')}. Everything saves automatically and is private to you.</p>
+<div class="rlab" style="color:var(--ink);margin:4px 2px 4px">Your data</div><p class="meta" style="margin:0 2px 10px;font-size:12.5px">Download a copy of everything anytime.</p>
+<div class="actions" style="margin:0 0 18px"><button class="btn out" data-a="export">Download backup</button><label class="btn out" style="cursor:pointer">Restore from file<input type="file" id="imp" accept=".json,application/json" style="display:none"></label></div>
+<div style="border-top:1px solid var(--line);padding:14px 0 10px"><button class="btn out" data-a="signout">Sign out</button></div>`)}`}
 
 function vFinished(){const list=S.projects.filter(p=>p.status==='finished');
 return `${back('settings','Settings')}<h1 class="h2" style="margin-top:6px">Finished projects</h1>${!list.length?'<p class="sub">Nothing here yet.</p>':''}
@@ -531,16 +559,11 @@ function vCustom(){
   <div class="grow"></div>${S.slices.some(s=>activeProjects(s.id).length)?'<p class="meta center" style="margin:18px 0 0">Removing a slice also deletes the projects inside it.</p>':''}
   <div class="row" style="margin-top:18px"><button class="link faint" data-a="cancelCustom" style="font-size:14px;padding:10px 4px">Cancel</button><button class="btn dark" data-a="saveCustom" style="width:auto;padding:13px 38px">Save</button></div>`}
 
-function vWhy(){return `<div class="why">${v.from==='onboard'?back('onboard','Back'):''}<h1 class="h1" style="font-size:34px;margin:8px 0 6px">How Trials works</h1>
-<h3>Why we hide your goal.</h3><p>A big goal you can see every day creates a gap between where you are and where you want to be — and that gap is what makes people feel behind, not the goal itself. Once it's written down, we tuck it away. Nothing left to measure yourself against.</p>
-<h3>Why this app is about actions, not outcomes.</h3><p>The goal isn't something you're secretly working toward in the background — it's meant to actually leave your mind. What's left is just the next experiment.</p>
-<h3>Why we encourage small steps.</h3><p>Confidence isn't built by attempting hard things — it's built by a track record of actually doing them. The more doable a step is, the more likely you are to actually finish it — and that's what adds up.</p>
-<h3>Why we ask who you're becoming.</h3><p>Every action is evidence of who you're becoming, not proof of how far you have left to go. In Completed, tap “+ Add your identity” under anything you've done and finish the sentence “I'm someone who…” in your own words, or pick a suggestion. Naming it yourself sticks more than anything the app could say for you.</p>
-<h3>Why experiments work two ways.</h3><p>Every card has a small switch. Most things you add are Do once — do it once, tap “I did it,” and it goes straight into Completed. Some things you'll want to keep showing up for. Flip the card to Log mode and it stays put, with a “Log it” button that adds to a quiet count.</p>
-<h3>Finished with a habit?</h3><p>When you're completely done with a Log mode experiment, tap “Edit” on its card, then “Mark done.” The card leaves your lab, and everything you logged stays in Completed. You can bring it back any time.</p>
-<h3>Why gratitude?</h3><p>Research suggests that writing down what you're grateful for, even one small thing a day, trains your attention to notice the good that's already in your life. People who do it tend to feel more optimistic, and in one well-known study, they even made more progress toward their personal goals. Turn on the Gratitude challenge in Settings to try it. Everything you write goes into one Gratitude list, shared across all your slices. You'll find it at the bottom of any experiment page.</p>
-<h3>Why reflect only every few days?</h3><p>Looking back now and then helps you learn from what you tried. Going over things constantly tends to turn into rumination, the same worries on repeat. That's why reflection comes on a schedule you choose, and you can always move it. Studies have also found that walking helps people think more creatively, and a walk in nature can ease repetitive negative thinking. So on reflection day, take a walk for as long as feels good, then write freely in your Journal. Turn on Active reflection in Settings to try it.</p>
-<h3>Why you can only pin three.</h3><p>Tap the pin on any card to keep it at the top for today. Three is enough to guide a day without turning it into a to-do list. Pins clear themselves tomorrow, so every day starts fresh.</p></div>`}
+const WHY=[['idea','The Idea',[['Why we hide your goal',"A big goal you can see every day creates a gap between where you are and where you want to be — and that gap is what makes people feel behind, not the goal itself. Once it's written down, we tuck it away. Nothing left to measure yourself against."],['Why this app is about actions, not outcomes',"The goal isn't something you're secretly working toward in the background — it's meant to actually leave your mind. What's left is just the next experiment."],['Why we encourage small steps',"Confidence isn't built by attempting hard things — it's built by a track record of actually doing them. The more doable a step is, the more likely you are to actually finish it — and that's what adds up."],["Why we ask who you're becoming","Every action is evidence of who you're becoming, not proof of how far you have left to go. In Completed, tap “+ Add your identity” under anything you've done and finish the sentence “I'm someone who…” in your own words, or pick a suggestion. Naming it yourself sticks more than anything the app could say for you."]]],['exp','Your Experiments',[['Why experiments work two ways',"Every card has a small switch. Most things you add are Do once — do it once, tap “I did it,” and it goes straight into Completed. Some things you'll want to keep showing up for. Flip the card to Log mode and it stays put, with a “Log it” button that adds to a quiet count."],['Finished with a habit?',"When you're completely done with a Log mode experiment, tap “Edit” on its card, then “Mark done.” The card leaves your lab, and everything you logged stays in Completed. You can bring it back any time."],['Why you can only pin three','Tap the pin on any card to keep it at the top for today. Three is enough to guide a day without turning it into a to-do list. Pins clear themselves tomorrow, so every day starts fresh.']]],['gr','Gratitude & Reflection',[['Why gratitude?',"Research suggests that writing down what you're grateful for, even one small thing a day, trains your attention to notice the good that's already in your life. People who do it tend to feel more optimistic, and in one well-known study, they even made more progress toward their personal goals. Turn on the Gratitude challenge in Settings to try it. Everything you write goes into one Gratitude list, shared across all your slices. You'll find it at the bottom of any experiment page."],['Why reflect only every few days?',"Looking back now and then helps you learn from what you tried. Going over things constantly tends to turn into rumination, the same worries on repeat. That's why reflection comes on a schedule you choose, and you can always move it. Studies have also found that walking helps people think more creatively, and a walk in nature can ease repetitive negative thinking. So on reflection day, take a walk for as long as feels good, then write freely in your Journal. Turn on Active reflection in Settings to try it."]]]];
+function vWhy(){
+  const back0=v.from==='onboard'?back('onboard','Back'):'';
+  return `${back0||TOPBAR()}<h1 class="h1" style="font-size:30px;margin:${back0?'8px':'0'} 0 6px">How Trials Works</h1><p class="sub" style="margin-bottom:4px">Tap a question to read more.</p>
+  ${WHY.map(([k,t,items])=>grp('w_'+k,t,items.length+' questions',items.map(([q,a],n)=>{const id=k+n,o=ui.wq===id;return `<div style="border-bottom:1px solid var(--line)"><button class="grph" style="padding:13px 2px" data-a="wq" data-k="${id}"><span class="serif" style="font-size:16px">${q}</span><svg class="chev" style="transform:rotate(${o?180:0}deg)" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button>${o?`<p style="font-size:14.5px;line-height:1.75;color:var(--ink-soft);margin:0 2px 14px">${a}</p>`:''}</div>`}).join(''))).join('')}`}
 
 function sidebar(){
   if(v.n==='pie')return sidebarHome();
@@ -611,7 +634,7 @@ function footer(){
   if(!USER||['onboard','loading','signin','offline'].includes(v.n)){f.hidden=true;return}
   const cur=['settings','finished','finlab'].includes(v.n)?'settings':v.n==='why'?'why':'pie';
   const b=(k,i,l,a)=>`<button class="${cur===k?'on':''}" data-a="${a}" ${cur===k?'aria-current="page"':''}>${i}<span>${l}</span></button>`;
-  f.innerHTML=`<div class="in">${b('pie',T_PIE,'Pie','tabPie')}${b('settings',T_SET,'Settings','tabSettings')}${b('why',T_BOOK,'How Trials works','tabWhy')}</div>`;f.hidden=false;
+  f.innerHTML=`<div class="in">${b('pie',T_PIE,'Pie','tabPie')}${b('settings',T_SET,'Settings','tabSettings')}${b('why',T_BOOK,'How Trials Works','tabWhy')}</div>`;f.hidden=false;
 }
 
 function render(){
@@ -727,6 +750,9 @@ const A={
   rEdit(){ui.redit=true;render()},rNoEdit(){ui.redit=false;render()},
   rEditSave(){const r=refls().find(x=>x.id===v.r);if(!r)return;r.text=(document.getElementById('rtext').value||'').trim();const ti=val('rtitle');if(ti)r.title=ti;else delete r.title;const d=val('rdate');if(d&&d<=today())r.date=d;ui.redit=false;save();render();toast('Saved')},
   rDel(){const id=v.r;ask('Delete this page?','It will be removed from your journal.','Delete',()=>{S.reflections=refls().filter(r=>r.id!==id);go('journal',{jt:'r'})})},
+  grpTog(d){const cur=document.querySelector(`[data-a=grpTog][data-k=${d.k}]`).getAttribute('aria-expanded')==='true';ui.open=Object.assign({},ui.open,{[d.k]:!cur});render()},
+  wq(d){ui.wq=ui.wq===d.k?null:d.k;render()},
+  info(d){ui.info=ui.info===d.k?null:d.k;render()},
   gList(){ui.gq=false;go('journal',{jt:'g',from:'pie'})},
   gqSave(){const t=val('gtext');if(!t)return;const w=val('gwhy');const before=gDays();S.gratitude.push(Object.assign({id:uid(),text:t,date:today()},w?{why:w}:{}));save();ui.gq=false;render();
     const n=gDays(),g=gGoal();let msg;
