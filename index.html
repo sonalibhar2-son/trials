@@ -291,7 +291,8 @@ const isoAdd=(iso,n)=>{const [y,m,d]=iso.split('-').map(Number);return isoOf(new
 const dDiff=(a,b)=>{const [y1,m1,d1]=a.split('-').map(Number),[y2,m2,d2]=b.split('-').map(Number);return Math.round((new Date(y2,m2-1,d2)-new Date(y1,m1-1,d1))/864e5)};
 const rfNext=()=>S.rf.next||isoAdd(S.rf.last,S.rf.every);
 const rfLeft=()=>rfOn()?Math.max(0,dDiff(today(),rfNext())):0;
-const rfDue=()=>rfOn()&&rfLeft()===0;
+const rfDue=()=>rfOn()&&rfNext()===today();
+function rfRoll(){if(!rfOn())return;let ch=false;while(rfNext()<today()){S.rf.last=rfNext();delete S.rf.next;ch=true}if(ch){delete S.rf.tucked;save()}}
 const refls=()=>S.reflections||(S.reflections=[]);
 const rfWhen=()=>{const l=rfLeft();return l===0?'today':l===1?'tomorrow':dayLabel(rfNext())==='Today'?'today':'on '+new Date(...rfNext().split('-').map((x,i)=>i===1?x-1:+x)).toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'})};
 const RIDEAS=['What went well?','What felt hard?',"What's one small thing to try next?"];
@@ -303,7 +304,9 @@ function rfBlock(){
     return head+`<div style="padding:4px 2px 16px;border-bottom:1px solid var(--line)">
     <div class="meta" style="font-size:13px;margin:6px 0 0">Reflect every</div><select id="rfE" class="gsel">${RF_EVERY.map(([k,l])=>`<option value="${k}" ${se==k?'selected':''}>${l}</option>`).join('')}</select>
     ${ui.rfCE?`<input id="rfEn" class="field" type="number" min="1" max="365" placeholder="Number of days" value="${on&&ce==='c'?S.rf.every:''}" style="margin:4px 0 8px">`:''}
-    <p class="meta" style="margin:6px 0 12px;line-height:1.6;font-size:12.5px">On reflection day, a card on the Pie page invites you to take a walk, or any gentle movement, then write freely in your Journal, under the pie. You can always move it to another day.</p>
+    ${on?'':`<div class="meta" style="font-size:13px;margin:10px 0 0">First reflection: <b id="rfFirst" style="color:var(--sky);font-weight:600">${ui.rfStart?(ui.rfStart===today()?'today':new Date(...ui.rfStart.split('-').map((x,i)=>i===1?x-1:+x)).toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'})):`in ${se==='c'?'…':se} days`}</b></div>
+    <label class="link" style="font-size:13.5px;position:relative;display:inline-block;margin-top:4px;cursor:pointer">or choose a start day<input id="rfStartDay" type="date" min="${today()}" style="position:absolute;inset:0;opacity:0;cursor:pointer"></label>`}
+    <p class="meta" style="margin:6px 0 12px;line-height:1.6;font-size:12.5px">On reflection day, a card on the Pie page invites you to take a walk, or any gentle movement, then write freely in your Journal. You can always move it to another day.</p>
     <div class="two"><button class="btn out" style="flex:1" data-a="rfCancel">Cancel</button><button class="btn" style="flex:1;background:var(--sky)" data-a="rfSave">Save</button></div></div>`}
   if(on)return head+`<div style="padding:2px 2px 16px;border-bottom:1px solid var(--line)"><div class="row"><span class="meta" style="margin:0;font-size:13px;color:var(--sky)">Every ${S.rf.every} ${S.rf.every===1?'day':'days'}</span><button class="link" style="font-size:13.5px" data-a="rfEdit">Edit</button></div>
     <div class="row" style="margin-top:6px"><span class="meta" style="margin:0;font-size:13px">Next reflection: ${rfWhen().replace(/^on /,'')}</span>${ui.rfMove?'':`<button class="link" style="font-size:13.5px" data-a="rfMove">Change day</button>`}</div>
@@ -314,9 +317,10 @@ function rfChooser(minAdd){return `<div style="font-size:15px;line-height:1.55">
     <label class="btn out" style="width:auto;padding:11px 18px;font-size:14px;position:relative;cursor:pointer">📅 Pick a day<input id="rfDay" type="date" min="${isoAdd(today(),minAdd)}" style="position:absolute;inset:0;opacity:0;cursor:pointer"></label></div>
     <button class="link faint" style="font-size:13px;margin-top:10px" data-a="rfMoveNo">Never mind</button>`}
 function rfCard(){if(!rfDue())return '';
+  if(S.rf.tucked===today()&&!ui.rfMove)return `<div class="center" style="margin:0 0 6px"><button class="gpill" style="color:var(--sky);background:var(--sky-bg);display:inline-flex" data-a="rfUntuck">🌿 Reflection day · Show</button></div>`;
   if(ui.rfMove)return `<div class="rcard">${rfChooser(1)}</div>`;
   return `<div class="rcard"><div style="font-size:15px;line-height:1.55"><b>🌿 Reflection day.</b> Take a walk, or any gentle movement, and look back on your experiments.</div>
-  <div class="row" style="margin-top:12px;gap:14px;justify-content:flex-start;flex-wrap:wrap"><button class="btn" style="width:auto;padding:11px 20px;background:var(--sky);font-size:14px" data-a="rfStart">Start walk</button><button class="link" style="font-size:13.5px;color:var(--sky)" data-a="rfMove">Another day</button><button class="link faint" style="font-size:13.5px" data-a="rfSkip">Skip this one</button></div></div>`}
+  <div class="row" style="margin-top:12px;gap:14px;justify-content:flex-start;flex-wrap:wrap"><button class="btn" style="width:auto;padding:11px 20px;background:var(--sky);font-size:14px" data-a="rfStart">Start walk</button><button class="link" style="font-size:13.5px;color:var(--sky)" data-a="rfMove">Another day</button><button class="link faint" style="font-size:13.5px" data-a="rfSkip">Skip this one</button></div><button class="link faint" style="font-size:12.5px;margin-top:8px" data-a="rfTuck">Tuck away</button></div>`}
 const jOn=()=>rfOn()||gcOn()||refls().length>0||S.gratitude.length>0;
 function vJournalBody(){const t=ui.jt||v.jt||(rfOn()&&!gcOn()&&!S.gratitude.length?'r':'g');
   const seg=k=>`<button class="${t===k?'on':''}" data-a="jtab" data-k="${k}">${k==='g'?'Gratitude':'Reflections'}</button>`;
@@ -407,7 +411,7 @@ function vPie(){
   <circle cx="140" cy="140" r="56" fill="var(--washi)" pointer-events="none" style="filter:drop-shadow(0 4px 10px rgba(0,0,0,.16))"/>
   <text pointer-events="none" x="140" y="133" text-anchor="middle" class="ring-t1">slices</text>
   <text pointer-events="none" x="140" y="156" text-anchor="middle" class="ring-t2">${n}</text>${labels}</svg></div>
-  <div class="center" style="display:flex;justify-content:center;gap:22px">${jOn()?`<button class="link faint" data-a="tabJournal" style="font-size:13px">📓 Journal</button>`:''}<button class="link faint" data-a="customize" style="font-size:13px">⚙ Customize Pie</button></div>`}
+  <div class="center" style="display:flex;justify-content:center;gap:22px"><button class="link faint" data-a="customize" style="font-size:13px">⚙ Customize Pie</button></div>`}
 
 function vStart(){const s=sl(v.s);return `${back('pie','Pie')}<h1 class="h1" style="margin-top:10px;font-size:28px">${esc(s.name)} · Project Experiments</h1>
 <div class="empty" style="flex:0;align-items:flex-start;text-align:left;padding:18px 0"><p class="sub" style="font-size:15px">Start a project to hold your experiments. Name the goal behind it, and it stays tucked away while you work.</p><button class="btn" data-a="newProj" data-id="${s.id}" style="width:auto;padding:14px 26px">Start a project</button></div>`}
@@ -445,7 +449,7 @@ function vLab(){
   return `<div class="row" style="zoom:${labZ()/100}"><button class="lab-icon" style="width:44px;height:44px" data-a="side" aria-label="Projects menu">${BARS}</button>
   <span class="row" style="gap:10px"><button class="pill" style="padding:11px 17px;font-size:14.5px" data-a="addExp">+ Experiment</button><button class="lab-icon" style="width:44px;height:44px;font-weight:700;font-size:16px" data-a="menu" aria-label="More">⋯</button><span class="zm" role="group" aria-label="Zoom"><button data-a="zoomOut" aria-label="Zoom out" title="Zoom out" ${labZ()<=ZS[0]?'disabled':''}><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.8-4.8M7.5 10.5h6"/></svg></button><button data-a="zoomIn" aria-label="Back toward default size" title="Zoom in" ${labZ()>=ZS[ZS.length-1]?'disabled':''}><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.8-4.8M7.5 10.5h6M10.5 7.5v6"/></svg></button></span></span></div>${menu}
   <div style="display:flex;flex-direction:column;flex:1;zoom:${labZ()/100}"><div style="margin-top:14px">${back('pie','Pie')}</div><h1 class="h1" style="font-size:24px;margin:6px 0 12px">${projCrumb()}</h1>${sel?'':tip}${body}
-  ${sel?'':`<div class="nav" style="margin-top:12px"><button data-a="completed">Completed</button><button data-a="grat">Gratitude</button></div>${pager(p)}`}</div>`}
+  ${sel?'':`<div class="nav" style="margin-top:12px"><button data-a="completed">Completed</button><button data-a="journalLab">Journal</button></div>${pager(p)}`}</div>`}
 
 function vAdd(){return `${back('lab','Lab')}<div class="crumb">${projCrumb()}</div><h1 class="h2">What will you try today?</h1><p class="sub">Keep it tiny and doable.</p>
 <input id="ename" class="field" placeholder="e.g. Read one page" autocomplete="off" maxlength="120"><button class="btn" data-a="saveExp">Add experiment</button>`}
@@ -501,7 +505,7 @@ return `<h1 class="h1" style="font-size:34px;margin:8px 0 22px">Settings</h1>
 <button class="set" data-a="reveal"><span><b>Hide project names</b><small>Show projects as Project 1, Project 2 and so on, so the big goal behind each one stays out of sight.</small></span><span class="toggle ${S.hideNames?'on':''}"><i></i></span></button>
 ${S.showFinished?`<button class="set" data-a="finAll"><b>Finished projects</b><span class="link">Open</span></button>`:''}
 <button class="set" data-a="customize"><b>Manage your pie</b><span class="link">Open</span></button>
-${gcBlock()}${rfBlock()}
+${gcBlock()}${rfBlock()}${jOn()?`<p class="meta" style="margin:10px 2px 0;line-height:1.6;font-size:12.5px">Your Journal (Gratitude and Reflections) is shared across all your slices. You'll find it at the bottom of any experiment page. <button class="link" style="font-size:12.5px" data-a="notebook">Open Journal</button></p>`:''}
 ${b?`<div class="card" style="margin-top:14px"><b style="font-weight:500">Restore previous pie</b><p class="sub" style="margin:4px 0 12px;font-size:13px">${days} days left before it's gone for good.</p><div class="actions" style="margin:0"><button class="did" data-a="restore">Restore</button><button class="adj" data-a="delBackup" style="color:var(--red);border-color:var(--red)">Delete now</button></div></div>`:''}
 <div class="sec" style="font-size:14px;margin-top:26px">Your account</div><p class="meta" style="margin:4px 0 14px;line-height:1.6;font-size:13px">Signed in as ${esc(USER?USER.email:'')}. Everything is saved to your account automatically and is private to you.</p>
 <button class="btn out" data-a="signout" style="margin-bottom:6px">Sign out</button>
@@ -576,7 +580,7 @@ function vJar(){
 
 function vRename(){const p=pr(v.p);return `${back('lab','Cancel')}<h1 class="h2" style="margin-top:6px">Rename this project</h1><input id="pname" class="field" value="${esc(p.name)}" maxlength="80"><button class="btn" data-a="saveRename">Save</button>`}
 
-const VIEWS={journal:()=>`<div class="row">${back('pie','Pie')}</div>`+vJournalBody(),walk:vWalk,rlog:vRlog,notebook:vNotebook,rpage:vRpage,loading:vLoading,signin:vSignin,offline:vOffline,jar:vJar,onboard:vOnboard,pie:vPie,start:vStart,lab:vLab,addExp:vAdd,adjust:vAdjust,completed:vCompleted,grat:vGrat,settings:vSettings,finished:vFinished,finlab:vFinLab,custom:vCustom,why:vWhy,rename:vRename};
+const VIEWS={journal:()=>`<div class="row">${v.from==='lab'?back('lab','Lab'):v.from==='settings'?back('settings','Settings'):back('pie','Pie')}</div>`+vJournalBody(),walk:vWalk,rlog:vRlog,notebook:vNotebook,rpage:vRpage,loading:vLoading,signin:vSignin,offline:vOffline,jar:vJar,onboard:vOnboard,pie:vPie,start:vStart,lab:vLab,addExp:vAdd,adjust:vAdjust,completed:vCompleted,grat:vGrat,settings:vSettings,finished:vFinished,finlab:vFinLab,custom:vCustom,why:vWhy,rename:vRename};
 
 // ---------- theme ----------
 const darkNow=()=>S.theme==='dark'||(S.theme==='auto'&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches);
@@ -608,6 +612,7 @@ function footer(){
 }
 
 function render(){
+  if(USER)rfRoll();
   const root=document.getElementById('app');
   const _sp=root.querySelector('.side .pane');const _st=_sp?_sp.scrollTop:0;
   const keepRen=ui.ren?document.getElementById('rn-'+ui.ren.id):null;if(keepRen)ui.ren.val=keepRen.value;
@@ -682,7 +687,7 @@ const A={
   finish(){const p=pr(v.p);mut(()=>{p.status='finished';return'Moved to Finished Projects'});const act=activeProjects(p.sliceId);if(act.length){S.lastProj[p.sliceId]=act[0].id;save();go('lab',{p:act[0].id})}else go('pie')},
   // sidebar
   side(){ui.side=true;render()},pins(){ui.pins=true;render()},
-  gq(){if(gDone()){ui.gnext=true;render();return}if(gToday()){go('grat',{from:'pie'});return}ui.gq=true;render()},
+  gq(){if(gDone()){ui.gnext=true;render();return}if(gToday()){go('journal',{jt:'g',from:'pie'});return}ui.gq=true;render()},
   gNextAgain(){S.gc={on:false};save();ui.gnext=false;go('settings');ui.gcEdit=true;render();setTimeout(()=>{const e=document.querySelector('[data-a=gcToggle]');e&&e.scrollIntoView({block:'center'})},50)},
   gNextEvery(){S.gc={on:true,days:-1,start:S.gc.start};save();ui.gnext=false;render();toast('Every day. Keep going 🤍')},
   gNextStop(){S.gc={on:false};save();ui.gnext=false;render();toast('Challenge stopped. Your notes are saved.')},
@@ -691,12 +696,13 @@ const A={
   gEditSave(d){const g=S.gratitude.find(x=>x.id===d.id);const t=val('ge-t'),w=val('ge-w');if(!g)return;if(!t)return toast('Write something first, or tap ✕ to delete it');g.text=t;if(w)g.why=w;else delete g.why;ui.gedit=null;save();render();toast('Saved')},
   rfToggle(){if(ui.rfEdit){ui.rfEdit=false;ui.rfCE=false;render();return}if(rfOn()){S.rf={on:false};save();render();toast('Reflection off');return}ui.rfEdit=true;render()},
   rfEdit(){ui.rfEdit=true;ui.rfCE=rfOn()&&!RF_EVERY.some(o=>o[0]===S.rf.every);render()},
-  rfCancel(){ui.rfEdit=false;ui.rfCE=false;render()},
+  rfTuck(){S.rf.tucked=today();save();render()},rfUntuck(){delete S.rf.tucked;save();render()},
+  rfCancel(){ui.rfEdit=false;ui.rfCE=false;ui.rfStart=null;render()},
   rfMoveAny(){ui.rfMove=true;render()},
   rfSave(){let e=document.getElementById('rfE').value;if(e==='c'){e=parseInt(val('rfEn'),10);if(!(e>0&&e<=365))return toast('Enter how many days')}else e=+e;
-    const was=rfOn();S.rf={on:true,every:e,last:was?S.rf.last:today()};ui.rfEdit=false;ui.rfCE=false;save();render();toast(was?'Saved':`First reflection ${rfWhen()}`)},
-  notebook(){go('journal',{jt:'r'})},jtab(d){ui.jt=d.k;render()},tabJournal(){go('journal')},
-  notebook2(){go('journal',{jt:'r'})},
+    const was=rfOn();const nx=was?S.rf.next:ui.rfStart;S.rf={on:true,every:e,last:was?S.rf.last:today()};if(nx)S.rf.next=nx;ui.rfStart=null;ui.rfEdit=false;ui.rfCE=false;save();render();toast(was?'Saved':rfDue()?'First reflection is today 🌿':`First reflection ${rfWhen()}`)},
+  notebook(){go('journal',{jt:v.n==='settings'?(rfOn()?'r':'g'):'r',from:v.n==='settings'?'settings':'pie'})},jtab(d){ui.jt=d.k;render()},tabJournal(){go('journal')},journalLab(){go('journal',{p:v.p,from:'lab'})},
+  notebook2(){go('journal',{jt:'r',from:v.from,p:v.p})},
   rfStart(){go('walk')},
   rfMove(){ui.rfMove=true;render()},rfMoveNo(){ui.rfMove=false;render()},
   rfTomorrow(){const snap=snapshot();S.rf.next=isoAdd(today(),1);ui.rfMove=false;save();render();toast('Moved to tomorrow 🌿',restoreFn(snap))},
@@ -705,11 +711,11 @@ const A={
   rfWrite(){go('rlog')},
   walk(){go('walk')},
   rfSaveLog(){const t=(document.getElementById('rtext').value||'').trim();const d=val('rdate')||today();const r={id:uid(),date:d>today()?today():d,text:t,ts:Date.now()};refls().push(r);if(rfOn()){S.rf.last=today();delete S.rf.next}save();go('journal',{jt:'r'});toast('Saved to your journal 🌿')},
-  rOpen(d){go('rpage',{r:d.id})},
+  rOpen(d){go('rpage',{r:d.id,from:v.from,p:v.p})},
   rEdit(){ui.redit=true;render()},rNoEdit(){ui.redit=false;render()},
   rEditSave(){const r=refls().find(x=>x.id===v.r);if(!r)return;r.text=(document.getElementById('rtext').value||'').trim();const ti=val('rtitle');if(ti)r.title=ti;else delete r.title;const d=val('rdate');if(d&&d<=today())r.date=d;ui.redit=false;save();render();toast('Saved')},
   rDel(){const id=v.r;ask('Delete this page?','It will be removed from your journal.','Delete',()=>{S.reflections=refls().filter(r=>r.id!==id);go('journal',{jt:'r'})})},
-  gList(){ui.gq=false;go('grat',{from:'pie'})},
+  gList(){ui.gq=false;go('journal',{jt:'g',from:'pie'})},
   gqSave(){const t=val('gtext');if(!t)return;const w=val('gwhy');const before=gDays();S.gratitude.push(Object.assign({id:uid(),text:t,date:today()},w?{why:w}:{}));save();ui.gq=false;render();
     const n=gDays(),g=gGoal();let msg;
     if(n===before)msg='Saved to Gratitude';
@@ -779,7 +785,7 @@ document.addEventListener('click',ev=>{
   if(ui.menu&&el.dataset.a!=='menu'&&!el.closest('.menu')){ui.menu=false}
   const f=A[el.dataset.a];if(f)f(el.dataset);
 });
-document.addEventListener('change',ev=>{if(ev.target.id==='rfDay'){A.rfMoveGo();return}if(ev.target.id==='rfE'){const c=ev.target.value==='c';if(c!==!!ui.rfCE){ui.rfCE=c;render()}return}if(ev.target.id==='gcsel'){const c=ev.target.value==='c';if(c!==!!ui.gcCustom){ui.gcCustom=c;render()}}});
+document.addEventListener('change',ev=>{if(ev.target.id==='rfDay'){A.rfMoveGo();return}if(ev.target.id==='rfStartDay'){const d=ev.target.value;if(d&&d>=today()){ui.rfStart=d;const sel=document.getElementById('rfE');const keep=sel?sel.value:null;const n=val('rfEn');render();const s2=document.getElementById('rfE');if(s2&&keep)s2.value=keep;const ne=document.getElementById('rfEn');if(ne&&n)ne.value=n}return}if(ev.target.id==='rfE'){const c=ev.target.value==='c';if(c!==!!ui.rfCE){ui.rfCE=c;render()}else if(!ui.rfStart){const f=document.getElementById('rfFirst');if(f)f.textContent=c?'in … days':`in ${ev.target.value} days`}return}if(ev.target.id==='gcsel'){const c=ev.target.value==='c';if(c!==!!ui.gcCustom){ui.gcCustom=c;render()}}});
 document.addEventListener('input',ev=>{const t=ev.target;
   if(t.dataset&&t.dataset.a==='rename'){sl(t.dataset.id).name=t.value||'Slice';save()}
   else if(t.id&&t.id.startsWith('idt-'))ui.idv=t.value;
