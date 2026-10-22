@@ -297,14 +297,17 @@ const refls=()=>S.reflections||(S.reflections=[]);
 const rfWhen=()=>{const l=rfLeft();return l===0?'today':l===1?'tomorrow':dayLabel(rfNext())==='Today'?'today':'on '+new Date(...rfNext().split('-').map((x,i)=>i===1?x-1:+x)).toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'})};
 const RIDEAS=['What went well?','What felt hard?',"What's one small thing to try next?"];
 function rfSince(){const st=S.rf&&S.rf.last||'0000';const ens=S.entries.filter(e=>e.date>=st);const done=new Set(S.exps.filter(e=>!e.repeats&&S.entries.some(n=>n.expId===e.id&&n.date>=st)).map(e=>e.id)).size;return {n:ens.length,done}}
+const rfSel=()=>ui.rfSel||(rfOn()?S.rf.every:7);
 function rfBlock(){
   const on=rfOn(),ed=ui.rfEdit;
   const head=`<button class="set" data-a="rfToggle"><span><b>Active reflection</b><small>Every few days, take a walk and look back on your experiments.</small></span><span class="toggle ${on||ed?'on':''}"><i></i></span></button>`;
-  if(ed){const ce=on?(RF_EVERY.some(o=>o[0]===S.rf.every)?S.rf.every:'c'):7,se=ui.rfCE?'c':ce;
+  if(ed){const se=rfSel(),opts=RF_EVERY.filter(o=>o[0]!=='c').map(o=>o[0]),isC=!opts.includes(se);
+    const first=ui.rfStart?(ui.rfStart===today()?'today':new Date(...ui.rfStart.split('-').map((x,i)=>i===1?x-1:+x)).toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'})):`in ${se} ${se===1?'day':'days'}`;
     return head+`<div style="padding:4px 2px 16px;border-bottom:1px solid var(--line)">
-    <div class="meta" style="font-size:13px;margin:6px 0 0">Reflect every</div><select id="rfE" class="gsel">${RF_EVERY.map(([k,l])=>`<option value="${k}" ${se==k?'selected':''}>${l}</option>`).join('')}</select>
-    ${ui.rfCE?`<input id="rfEn" class="field" type="number" min="1" max="365" placeholder="Number of days" value="${on&&ce==='c'?S.rf.every:''}" style="margin:4px 0 8px">`:''}
-    ${on?'':`<div class="meta" style="font-size:13px;margin:10px 0 0">First reflection: <b id="rfFirst" style="color:var(--sky);font-weight:600">${ui.rfStart?(ui.rfStart===today()?'today':new Date(...ui.rfStart.split('-').map((x,i)=>i===1?x-1:+x)).toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'})):`in ${se==='c'?'…':se} days`}</b></div>
+    <div class="meta" style="font-size:13px;margin:6px 0 0">Reflect every</div>
+    ${ui.rfCE?`<div class="row" style="justify-content:flex-start;gap:10px;margin:8px 0 6px"><input id="rfEn" class="field" type="number" inputmode="numeric" min="1" max="365" placeholder="e.g. 13" value="${ui.rfLastC||''}" style="margin:0;width:110px"><span style="font-size:15px">days</span><button class="btn" style="width:auto;padding:10px 18px;font-size:14px;background:var(--sky)" data-a="rfNSet">Save</button></div><button class="link faint" style="font-size:13px" data-a="rfNBack">Back to the list</button>`
+      :`<select id="rfE" class="gsel">${opts.map(k=>`<option value="${k}" ${se===k?'selected':''}>${k} days</option>`).join('')}<option value="c" ${isC?'selected':''}>${isC?`${se} ${se===1?'day':'days'} (custom)`:'Custom…'}</option></select>${isC?`<button class="link" style="font-size:13px" data-a="rfNEdit">Change number</button>`:''}`}
+    ${on?'':`<div class="meta" style="font-size:13px;margin:10px 0 0">First reflection: <b id="rfFirst" style="color:var(--sky);font-weight:600">${first}</b></div>
     ${ui.rfStart?`<button class="link" style="font-size:13.5px;margin:4px 16px 0 0" data-a="rfStartClear">Use default</button>`:''}<span style="position:relative;display:inline-block"><button class="link" style="font-size:13.5px;margin-top:4px" data-a="pickDate" data-for="rfStartDay">${ui.rfStart?'pick another day':'or choose a start day'}</button><input id="rfStartDay" type="date" min="${today()}" tabindex="-1" aria-hidden="true" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;border:0;padding:0"></span>`}
     <p class="meta" style="margin:6px 0 12px;line-height:1.6;font-size:12.5px">On reflection day, a card on the Pie page invites you to take a walk, or any gentle movement, then write freely in your Journal. You can always move it to another day.</p>
     <div class="two"><button class="btn out" style="flex:1" data-a="rfCancel">Cancel</button><button class="btn" style="flex:1;background:var(--sky)" data-a="rfSave">Save</button></div></div>`}
@@ -356,17 +359,18 @@ const gHist=()=>S.gcHist||(S.gcHist=[]);
 const MILES=[7,30,100,365];
 const gTotal=()=>new Set(S.gratitude.map(g=>g.date)).size;
 const RING=(f,sz=22)=>{const r=8.5,c=2*Math.PI*r;return `<svg width="${sz}" height="${sz}" viewBox="0 0 22 22"><circle cx="11" cy="11" r="${r}" fill="none" stroke="currentColor" stroke-opacity=".22" stroke-width="2.2"/><circle cx="11" cy="11" r="${r}" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="${(c*f).toFixed(2)} ${c.toFixed(2)}" transform="rotate(-90 11 11)"/><path d="M11 14.6s-3.4-2-3.4-4.2a1.8 1.8 0 0 1 3.4-.8 1.8 1.8 0 0 1 3.4.8c0 2.2-3.4 4.2-3.4 4.2Z" fill="currentColor"/></svg>`};
+const gcSelV=()=>ui.gcSel??(gcOn()?S.gc.days:30);
 function gcBlock(){
   const on=gcOn(),ed=ui.gcEdit;
   const head=`<button class="set" data-a="gcToggle"><span><b>Gratitude challenge</b><small>Write one thing you're grateful for each day.</small></span><span class="toggle ${on||ed?'on':''}"><i></i></span></button>`;
-  if(ed){const cur=on?(GC_OPTS.some(o=>o[0]===S.gc.days)?S.gc.days:'c'):30;const sel=ui.gcCustom?'c':cur;
+  if(ed){const se=gcSelV(),pre=GC_OPTS.filter(o=>o[0]!==0&&o[0]!=='c'),isC=!pre.some(o=>o[0]===se);
     return head+`<div style="padding:4px 2px 16px;border-bottom:1px solid var(--line)"><div class="meta" style="font-size:13px;margin:6px 0 0">How long?</div>
-    <select id="gcsel" class="gsel">${GC_OPTS.filter(o=>o[0]!==0).map(([k,l])=>`<option value="${k}" ${sel==k?'selected':''}>${l}</option>`).join('')}</select>
-    ${ui.gcCustom?`<input id="gcnum" class="field" type="number" min="1" max="999" placeholder="Number of days" value="${on&&cur==='c'?S.gc.days:''}" style="margin:6px 0 10px">`:''}
+    ${ui.gcCE?`<div class="row" style="justify-content:flex-start;gap:10px;margin:8px 0 6px"><input id="gcnum" class="field" type="number" inputmode="numeric" min="1" max="999" placeholder="e.g. 45" value="${ui.gcLastC||''}" style="margin:0;width:110px"><span style="font-size:15px">days</span><button class="btn" style="width:auto;padding:10px 18px;font-size:14px;background:var(--rose)" data-a="gcNSet">Save</button></div><button class="link faint" style="font-size:13px" data-a="gcNBack">Back to the list</button>`
+      :`<select id="gcsel" class="gsel">${pre.map(([k,l])=>`<option value="${k}" ${se===k?'selected':''}>${l}</option>`).join('')}<option value="c" ${isC?'selected':''}>${isC?`${se} days (custom)`:'Custom…'}</option></select>${isC?`<button class="link" style="font-size:13px" data-a="gcNEdit">Change number</button>`:''}`}
     <p class="meta" style="margin:6px 0 12px;line-height:1.6;font-size:12.5px">A small rose button on the Pie page keeps track. Your notes go into one Gratitude list shared across all your slices.</p>
     <div class="two"><button class="btn out" style="flex:1" data-a="gcCancel">Cancel</button><button class="btn" style="flex:1;background:var(--rose)" data-a="gcSave">Save</button></div></div>`}
   if(on){const g=gGoal(),n=gDays();
-    return head+`<div class="row" style="padding:2px 2px 16px;border-bottom:1px solid var(--line)"><span class="meta" style="margin:0;font-size:13px;color:var(--rose)">${gDone()?`${g}-day challenge · finished 🎉`:`${g?`${g}-day challenge`:'Every day'}`} · ${gDone()?'':` · ${n?`${n} grateful ${n===1?'day':'days'} so far`:'starts today'}`}</span><button class="link" style="font-size:13.5px" data-a="gcEdit">Edit</button></div>`}
+    return head+`<div class="row" style="padding:2px 2px 16px;border-bottom:1px solid var(--line)"><span class="meta" style="margin:0;font-size:13px;color:var(--rose)">${gDone()?`${g}-day challenge · finished 🎉`:`${g?`${g}-day challenge`:'Every day'}`}${gDone()?'':` · ${n?`${n} grateful ${n===1?'day':'days'} so far`:'starts today'}`}</span><button class="link" style="font-size:13.5px" data-a="gcEdit">Edit</button></div>`}
   return head}
 function gPill(){if(gDone())return `<button class="gpill" data-a="gq" aria-label="Gratitude challenge finished">${RING(1)}<span>Done! 🎉</span></button>`;const n=gDays(),g=gGoal(),f=g?Math.min(1,n/g):(gToday()?1:0);
   return `<button class="gpill" data-a="gq" aria-label="Gratitude challenge">${RING(f)}<span>${gToday()?'✓ ':''}${n?`${n} ${n===1?'day':'days'}`:'Grateful?'}</span></button>`}
@@ -695,17 +699,20 @@ const A={
   gEditNo(){ui.gedit=null;render()},
   gEditSave(d){const g=S.gratitude.find(x=>x.id===d.id);const t=val('ge-t'),w=val('ge-w');if(!g)return;if(!t)return toast('Write something first, or tap ✕ to delete it');g.text=t;if(w)g.why=w;else delete g.why;ui.gedit=null;save();render();toast('Saved')},
   rfToggle(){if(ui.rfEdit){ui.rfEdit=false;ui.rfCE=false;render();return}if(rfOn()){S.rf={on:false};save();render();toast('Reflection off');return}ui.rfEdit=true;render()},
-  rfEdit(){ui.rfEdit=true;ui.rfCE=rfOn()&&!RF_EVERY.some(o=>o[0]===S.rf.every);render()},
+  rfEdit(){ui.rfEdit=true;ui.rfCE=false;ui.rfSel=S.rf.every;ui.rfLastC=RF_EVERY.some(o=>o[0]===S.rf.every)?null:S.rf.every;render()},
   rfTuck(){S.rf.tucked=today();save();render()},rfUntuck(){delete S.rf.tucked;save();render()},
-  rfStartClear(){const sel=document.getElementById('rfE');const keep=sel?sel.value:null;const n=val('rfEn');ui.rfStart=null;render();const s2=document.getElementById('rfE');if(s2&&keep)s2.value=keep;const ne=document.getElementById('rfEn');if(ne&&n)ne.value=n;const f=document.getElementById('rfFirst');if(f&&keep)f.textContent=keep==='c'?(n?`in ${n} days`:'in … days'):`in ${keep} days`},
+  rfStartClear(){ui.rfStart=null;render()},
+  rfNSet(){const n=parseInt(val('rfEn'),10);if(!(n>0&&n<=365))return toast('Enter a number of days');ui.rfSel=n;ui.rfLastC=n;ui.rfCE=false;render()},
+  rfNBack(){ui.rfCE=false;render()},
+  rfNEdit(){ui.rfCE=true;render();const n=document.getElementById('rfEn');n&&n.focus()},
   rfUsual(){const snap=snapshot();delete S.rf.next;ui.rfMove=false;save();render();toast(`Back to your usual schedule: ${rfWhen().replace(/^on /,'')} 🌿`,restoreFn(snap))},
   pickDate(d){const el=document.getElementById(d.for);if(!el)return;el.value='';delete el.dataset.done;el.blur();
     try{if(el.showPicker){el.showPicker();return}}catch(e){}
     el.style.pointerEvents='auto';el.focus();el.click()},
-  rfCancel(){ui.rfEdit=false;ui.rfCE=false;ui.rfStart=null;render()},
+  rfCancel(){ui.rfEdit=false;ui.rfCE=false;ui.rfStart=null;ui.rfSel=null;ui.rfLastC=null;render()},
   rfMoveAny(){ui.rfMove=true;render()},
-  rfSave(){let e=document.getElementById('rfE').value;if(e==='c'){e=parseInt(val('rfEn'),10);if(!(e>0&&e<=365))return toast('Enter how many days')}else e=+e;
-    const was=rfOn();const nx=was?S.rf.next:ui.rfStart;S.rf={on:true,every:e,last:was?S.rf.last:today()};if(nx)S.rf.next=nx;ui.rfStart=null;ui.rfEdit=false;ui.rfCE=false;save();render();toast(was?'Saved':rfDue()?'First reflection is today 🌿':`First reflection ${rfWhen()}`)},
+  rfSave(){if(ui.rfCE){const n=parseInt(val('rfEn'),10);if(!(n>0&&n<=365))return toast('Enter how many days, or tap Back to the list');ui.rfSel=n;ui.rfLastC=n;ui.rfCE=false}const e=rfSel();
+    const was=rfOn();const nx=was?S.rf.next:ui.rfStart;S.rf={on:true,every:e,last:was?S.rf.last:today()};if(nx)S.rf.next=nx;ui.rfStart=null;ui.rfSel=null;ui.rfLastC=null;ui.rfEdit=false;save();render();toast(was?'Saved':rfDue()?'First reflection is today 🌿':`First reflection ${rfWhen()}`)},
   notebook(){go('journal',{jt:v.n==='settings'?(rfOn()?'r':'g'):'r',from:v.n==='settings'?'settings':'pie'})},jtab(d){ui.jt=d.k;render()},tabJournal(){go('journal')},journalLab(){go('journal',{p:v.p,from:'lab'})},
   notebook2(){go('journal',{jt:'r',from:v.from,p:v.p})},
   rfStart(){go('walk')},
@@ -728,11 +735,14 @@ const A={
     else if(!g&&MILES.includes(n)){gHist().push({days:n,date:today(),every:true});save();msg=`${n} grateful days! 🤍`}
     else msg=n===1?'First one. Nice start.':g&&n===Math.ceil(g/2)?'Halfway there. Keep going.':`${n} grateful days`;
     toast(msg)},
-  gcToggle(){if(ui.gcEdit){ui.gcEdit=false;ui.gcCustom=false;render();return}if(gcOn()){S.gc={on:false};save();render();toast('Challenge off');return}ui.gcEdit=true;render()},
-  gcEdit(){ui.gcEdit=true;ui.gcCustom=gcOn()&&!GC_OPTS.some(o=>o[0]===S.gc.days);render()},
-  gcCancel(){ui.gcEdit=false;ui.gcCustom=false;render()},
-  gcSave(){let x=document.getElementById('gcsel').value;if(x==='c'){x=parseInt(val('gcnum'),10);if(!(x>0&&x<=999))return toast('Enter a number of days')}else x=+x;
-    const same=gcOn()&&S.gc.days===x;S.gc={on:true,days:x,start:same?S.gc.start:(gcOn()?S.gc.start:today())};ui.gcEdit=false;ui.gcCustom=false;save();render();toast(x>0?`${x}-day challenge`:'Every day')},
+  gcToggle(){if(ui.gcEdit){ui.gcEdit=false;ui.gcCE=false;ui.gcSel=null;render();return}if(gcOn()){S.gc={on:false};save();render();toast('Challenge off');return}ui.gcEdit=true;render()},
+  gcEdit(){ui.gcEdit=true;ui.gcCE=false;ui.gcSel=S.gc.days;ui.gcLastC=GC_OPTS.some(o=>o[0]===S.gc.days)?null:S.gc.days;render()},
+  gcCancel(){ui.gcEdit=false;ui.gcCE=false;ui.gcSel=null;ui.gcLastC=null;render()},
+  gcSave(){if(ui.gcCE){const n=parseInt(val('gcnum'),10);if(!(n>0&&n<=999))return toast('Enter how many days, or tap Back to the list');ui.gcSel=n;ui.gcCE=false}let x=gcSelV();
+    const same=gcOn()&&S.gc.days===x;S.gc={on:true,days:x,start:same?S.gc.start:(gcOn()?S.gc.start:today())};ui.gcEdit=false;ui.gcSel=null;ui.gcLastC=null;save();render();toast(x>0?`${x}-day challenge`:'Every day')},
+  gcNSet(){const n=parseInt(val('gcnum'),10);if(!(n>0&&n<=999))return toast('Enter a number of days');ui.gcSel=n;ui.gcLastC=n;ui.gcCE=false;render()},
+  gcNBack(){ui.gcCE=false;render()},
+  gcNEdit(){ui.gcCE=true;render();const n=document.getElementById('gcnum');n&&n.focus()},
   gcSet(d){const el=document.getElementById('gcsel');let x=el?el.value:'0';if(x==='c'){ui.gcCustom=true;render();return}ui.gcCustom=false;x=+x;
     if(!x){S.gc={on:false};save();render();toast('Challenge off');return}
     S.gc={on:true,days:x,start:today()};save();render();toast(x>0?`${x}-day challenge started`:'Every day. Started.')},
@@ -792,10 +802,10 @@ document.addEventListener('click',ev=>{
 });
 function onDatePick(ev){const t=ev.target;if(!t||!t.value)return false;
   if(t.id==='rfDay'){if(t.dataset.done===t.value)return true;t.dataset.done=t.value;A.rfMoveGo();return true}
-  if(t.id==='rfStartDay'){if(ui.rfStart===t.value)return true;const d=t.value;if(d>=today()){ui.rfStart=d;const sel=document.getElementById('rfE');const keep=sel?sel.value:null;const n=val('rfEn');render();const s2=document.getElementById('rfE');if(s2&&keep)s2.value=keep;const ne=document.getElementById('rfEn');if(ne&&n)ne.value=n}return true}
+  if(t.id==='rfStartDay'){if(ui.rfStart===t.value)return true;const d=t.value;if(d>=today()){ui.rfStart=d;render()}return true}
   return false}
 document.addEventListener('input',ev=>{onDatePick(ev)});
-document.addEventListener('change',ev=>{if(ev.target.id==='rfDay'||ev.target.id==='rfStartDay'){onDatePick(ev);return}if(ev.target.id==='rfStartDayOLD'){const d=ev.target.value;if(d&&d>=today()){ui.rfStart=d;const sel=document.getElementById('rfE');const keep=sel?sel.value:null;const n=val('rfEn');render();const s2=document.getElementById('rfE');if(s2&&keep)s2.value=keep;const ne=document.getElementById('rfEn');if(ne&&n)ne.value=n}return}if(ev.target.id==='rfE'){const c=ev.target.value==='c';if(c!==!!ui.rfCE){ui.rfCE=c;render()}else if(!ui.rfStart){const f=document.getElementById('rfFirst');if(f)f.textContent=c?'in … days':`in ${ev.target.value} days`}return}if(ev.target.id==='gcsel'){const c=ev.target.value==='c';if(c!==!!ui.gcCustom){ui.gcCustom=c;render()}}});
+document.addEventListener('change',ev=>{if(ev.target.id==='rfDay'||ev.target.id==='rfStartDay'){onDatePick(ev);return}if(ev.target.id==='rfStartDayOLD'){const d=ev.target.value;if(d&&d>=today()){ui.rfStart=d;const sel=document.getElementById('rfE');const keep=sel?sel.value:null;const n=val('rfEn');render();const s2=document.getElementById('rfE');if(s2&&keep)s2.value=keep;const ne=document.getElementById('rfEn');if(ne&&n)ne.value=n}return}if(ev.target.id==='rfE'){const x=ev.target.value;if(x==='c'){ui.rfCE=true;render();const n=document.getElementById('rfEn');n&&n.focus()}else{ui.rfSel=+x;render()}return}if(ev.target.id==='gcsel'){const x=ev.target.value;if(x==='c'){ui.gcCE=true;render();const n=document.getElementById('gcnum');n&&n.focus()}else{ui.gcSel=+x;render()}}});
 document.addEventListener('input',ev=>{const t=ev.target;
   if(t.dataset&&t.dataset.a==='rename'){sl(t.dataset.id).name=t.value||'Slice';save()}
   else if(t.id&&t.id.startsWith('idt-'))ui.idv=t.value;
