@@ -305,7 +305,7 @@ function rfBlock(){
     <div class="meta" style="font-size:13px;margin:6px 0 0">Reflect every</div><select id="rfE" class="gsel">${RF_EVERY.map(([k,l])=>`<option value="${k}" ${se==k?'selected':''}>${l}</option>`).join('')}</select>
     ${ui.rfCE?`<input id="rfEn" class="field" type="number" min="1" max="365" placeholder="Number of days" value="${on&&ce==='c'?S.rf.every:''}" style="margin:4px 0 8px">`:''}
     ${on?'':`<div class="meta" style="font-size:13px;margin:10px 0 0">First reflection: <b id="rfFirst" style="color:var(--sky);font-weight:600">${ui.rfStart?(ui.rfStart===today()?'today':new Date(...ui.rfStart.split('-').map((x,i)=>i===1?x-1:+x)).toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'})):`in ${se==='c'?'…':se} days`}</b></div>
-    <label class="link" style="font-size:13.5px;position:relative;display:inline-block;margin-top:4px;cursor:pointer">or choose a start day<input id="rfStartDay" type="date" min="${today()}" style="position:absolute;inset:0;opacity:0;cursor:pointer"></label>`}
+    <span style="position:relative;display:inline-block"><button class="link" style="font-size:13.5px;margin-top:4px" data-a="pickDate" data-for="rfStartDay">or choose a start day</button><input id="rfStartDay" type="date" min="${today()}" tabindex="-1" aria-hidden="true" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;border:0;padding:0"></span>`}
     <p class="meta" style="margin:6px 0 12px;line-height:1.6;font-size:12.5px">On reflection day, a card on the Pie page invites you to take a walk, or any gentle movement, then write freely in your Journal. You can always move it to another day.</p>
     <div class="two"><button class="btn out" style="flex:1" data-a="rfCancel">Cancel</button><button class="btn" style="flex:1;background:var(--sky)" data-a="rfSave">Save</button></div></div>`}
   if(on)return head+`<div style="padding:2px 2px 16px;border-bottom:1px solid var(--line)"><div class="row"><span class="meta" style="margin:0;font-size:13px;color:var(--sky)">Every ${S.rf.every} ${S.rf.every===1?'day':'days'}</span><button class="link" style="font-size:13.5px" data-a="rfEdit">Edit</button></div>
@@ -314,7 +314,7 @@ function rfBlock(){
   return head}
 function rfChooser(minAdd){return `<div style="font-size:15px;line-height:1.55"><b style="color:var(--sky)">When works better?</b></div>
     <div class="row" style="gap:10px;margin-top:12px;justify-content:flex-start"><button class="btn" style="width:auto;padding:11px 20px;font-size:14px;background:var(--sky)" data-a="rfTomorrow">Tomorrow</button>
-    <label class="btn out" style="width:auto;padding:11px 18px;font-size:14px;position:relative;cursor:pointer">📅 Pick a day<input id="rfDay" type="date" min="${isoAdd(today(),minAdd)}" style="position:absolute;inset:0;opacity:0;cursor:pointer"></label></div>
+    <span style="position:relative;display:inline-block"><button class="btn out" style="width:auto;padding:11px 18px;font-size:14px" data-a="pickDate" data-for="rfDay">📅 Pick a day</button><input id="rfDay" type="date" min="${isoAdd(today(),minAdd)}" tabindex="-1" aria-hidden="true" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;border:0;padding:0"></span></div>
     <button class="link faint" style="font-size:13px;margin-top:10px" data-a="rfMoveNo">Never mind</button>`}
 function rfCard(){if(!rfDue())return '';
   if(S.rf.tucked===today()&&!ui.rfMove)return `<div class="center" style="margin:0 0 6px"><button class="gpill" style="color:var(--sky);background:var(--sky-bg);display:inline-flex" data-a="rfUntuck">🌿 Reflection day · Show</button></div>`;
@@ -697,6 +697,9 @@ const A={
   rfToggle(){if(ui.rfEdit){ui.rfEdit=false;ui.rfCE=false;render();return}if(rfOn()){S.rf={on:false};save();render();toast('Reflection off');return}ui.rfEdit=true;render()},
   rfEdit(){ui.rfEdit=true;ui.rfCE=rfOn()&&!RF_EVERY.some(o=>o[0]===S.rf.every);render()},
   rfTuck(){S.rf.tucked=today();save();render()},rfUntuck(){delete S.rf.tucked;save();render()},
+  pickDate(d){const el=document.getElementById(d.for);if(!el)return;el.value='';el.blur();
+    try{if(el.showPicker){el.showPicker();return}}catch(e){}
+    el.style.pointerEvents='auto';el.focus();el.click()},
   rfCancel(){ui.rfEdit=false;ui.rfCE=false;ui.rfStart=null;render()},
   rfMoveAny(){ui.rfMove=true;render()},
   rfSave(){let e=document.getElementById('rfE').value;if(e==='c'){e=parseInt(val('rfEn'),10);if(!(e>0&&e<=365))return toast('Enter how many days')}else e=+e;
