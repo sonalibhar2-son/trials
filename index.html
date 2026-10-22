@@ -697,7 +697,7 @@ const A={
   rfToggle(){if(ui.rfEdit){ui.rfEdit=false;ui.rfCE=false;render();return}if(rfOn()){S.rf={on:false};save();render();toast('Reflection off');return}ui.rfEdit=true;render()},
   rfEdit(){ui.rfEdit=true;ui.rfCE=rfOn()&&!RF_EVERY.some(o=>o[0]===S.rf.every);render()},
   rfTuck(){S.rf.tucked=today();save();render()},rfUntuck(){delete S.rf.tucked;save();render()},
-  pickDate(d){const el=document.getElementById(d.for);if(!el)return;el.value='';el.blur();
+  pickDate(d){const el=document.getElementById(d.for);if(!el)return;el.value='';delete el.dataset.done;el.blur();
     try{if(el.showPicker){el.showPicker();return}}catch(e){}
     el.style.pointerEvents='auto';el.focus();el.click()},
   rfCancel(){ui.rfEdit=false;ui.rfCE=false;ui.rfStart=null;render()},
@@ -788,7 +788,12 @@ document.addEventListener('click',ev=>{
   if(ui.menu&&el.dataset.a!=='menu'&&!el.closest('.menu')){ui.menu=false}
   const f=A[el.dataset.a];if(f)f(el.dataset);
 });
-document.addEventListener('change',ev=>{if(ev.target.id==='rfDay'){A.rfMoveGo();return}if(ev.target.id==='rfStartDay'){const d=ev.target.value;if(d&&d>=today()){ui.rfStart=d;const sel=document.getElementById('rfE');const keep=sel?sel.value:null;const n=val('rfEn');render();const s2=document.getElementById('rfE');if(s2&&keep)s2.value=keep;const ne=document.getElementById('rfEn');if(ne&&n)ne.value=n}return}if(ev.target.id==='rfE'){const c=ev.target.value==='c';if(c!==!!ui.rfCE){ui.rfCE=c;render()}else if(!ui.rfStart){const f=document.getElementById('rfFirst');if(f)f.textContent=c?'in … days':`in ${ev.target.value} days`}return}if(ev.target.id==='gcsel'){const c=ev.target.value==='c';if(c!==!!ui.gcCustom){ui.gcCustom=c;render()}}});
+function onDatePick(ev){const t=ev.target;if(!t||!t.value)return false;
+  if(t.id==='rfDay'){if(t.dataset.done===t.value)return true;t.dataset.done=t.value;A.rfMoveGo();return true}
+  if(t.id==='rfStartDay'){if(ui.rfStart===t.value)return true;const d=t.value;if(d>=today()){ui.rfStart=d;const sel=document.getElementById('rfE');const keep=sel?sel.value:null;const n=val('rfEn');render();const s2=document.getElementById('rfE');if(s2&&keep)s2.value=keep;const ne=document.getElementById('rfEn');if(ne&&n)ne.value=n}return true}
+  return false}
+document.addEventListener('input',ev=>{onDatePick(ev)});
+document.addEventListener('change',ev=>{if(ev.target.id==='rfDay'||ev.target.id==='rfStartDay'){onDatePick(ev);return}if(ev.target.id==='rfStartDayOLD'){const d=ev.target.value;if(d&&d>=today()){ui.rfStart=d;const sel=document.getElementById('rfE');const keep=sel?sel.value:null;const n=val('rfEn');render();const s2=document.getElementById('rfE');if(s2&&keep)s2.value=keep;const ne=document.getElementById('rfEn');if(ne&&n)ne.value=n}return}if(ev.target.id==='rfE'){const c=ev.target.value==='c';if(c!==!!ui.rfCE){ui.rfCE=c;render()}else if(!ui.rfStart){const f=document.getElementById('rfFirst');if(f)f.textContent=c?'in … days':`in ${ev.target.value} days`}return}if(ev.target.id==='gcsel'){const c=ev.target.value==='c';if(c!==!!ui.gcCustom){ui.gcCustom=c;render()}}});
 document.addEventListener('input',ev=>{const t=ev.target;
   if(t.dataset&&t.dataset.a==='rename'){sl(t.dataset.id).name=t.value||'Slice';save()}
   else if(t.id&&t.id.startsWith('idt-'))ui.idv=t.value;
